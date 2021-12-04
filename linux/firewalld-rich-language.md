@@ -1,0 +1,2 @@
+# Firewalld Rich Language
+
