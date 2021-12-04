@@ -4,7 +4,7 @@
 
 ### 工具
 
-[Etcher](https://etcher.io/)
+[Etcher](https://etcher.io)
 
 SD 卡
 
@@ -40,7 +40,9 @@ SD 卡
 
 Linux 电脑或者 Linux 虚拟机
 
-压缩脚本[PiShrink](https://github.com/Drewsif/PiShrink/blob/master/pishrink.sh)
+压缩脚本`pishrink.sh`
+
+{% file src="../.gitbook/assets/pishrink.sh" %}
 
 ### 步骤
 
@@ -78,4 +80,4 @@ chmod +x pishrink.sh
 
 ![PiShrink](../.gitbook/assets/PiShrink.png)
 
-sd_shrink.img 为打包后的镜像问题，通过进行烧录工具可以直接烧录到 SD 卡。
+sd\_shrink.img 为打包后的镜像问题，通过进行烧录工具可以直接烧录到 SD 卡。
