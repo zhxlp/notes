@@ -123,3 +123,5 @@
   * [OpenStack-RBD 导入镜像](openstack/openstackrbd-dao-ru-jing-xiang.md)
   * [OpenStack-Rocky 灾备](openstack/openstackrocky-zai-bei.md)
   * [rbd-mirror](openstack/rbd-mirror.md)
+* [Other](other/README.md)
+  * [华为一碰传标签制作](other/hua-wei-yi-peng-chuan-biao-qian-zhi-zuo.md)
