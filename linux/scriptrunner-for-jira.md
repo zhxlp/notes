@@ -1,4 +1,4 @@
-# Jira 扩展
+# ScriptRunner For Jira
 
 ## 工作流属性
 
@@ -154,7 +154,6 @@ CustomFieldManager customFieldManager = ComponentAccessor.getCustomFieldManager(
 // 10915 历史经办人字段
 CustomField historyAssigneesField = customFieldManager.getCustomFieldObject(10915)
 issue.setCustomFieldValue(historyAssigneesField,users)
-
 ```
 
 ### 设置抄送人
@@ -179,13 +178,11 @@ CustomFieldManager customFieldManager = ComponentAccessor.getCustomFieldManager(
 // 10916 抄送人字段
 CustomField CCListField = customFieldManager.getCustomFieldObject(10916)
 issue.setCustomFieldValue(CCListField,users)
-
 ```
 
 ### 设置审批人为部门主管
 
-Post Function
-注：需要用户组中有 XX 和 XX 主管组
+Post Function 注：需要用户组中有 XX 和 XX 主管组
 
 ```java
 import com.atlassian.jira.component.ComponentAccessor
@@ -227,7 +224,6 @@ for(int i=0;i<groups.size();i++){
     break
 }
 issue.setAssignee(assignee)
-
 ```
 
 ### 批量子任务
@@ -268,4 +264,39 @@ for(ApplicationUser user : users){
     issueManager.createIssueObject(parentIssue.getAssignee(), newSubTask)
     subTaskManager.createSubTaskIssueLink(parentIssue,newSubTask,parentIssue.getAssignee())
 }
+```
+
+### JQL 搜索问题
+
+```groovy
+import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.jql.parser.JqlQueryParser;
+import com.atlassian.jira.issue.search.SearchProvider;
+import com.atlassian.jira.web.bean.PagerFilter;
+import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.issue.search.SearchQuery;
+
+def findIssues(String jqlQuery,String username) {
+  def issueManager = ComponentAccessor.issueManager;
+  def userManager = ComponentAccessor.userManager;
+  def user = userManager.getUserByName(username);
+  def jqlQueryParser = ComponentAccessor.getComponent(JqlQueryParser);
+  def searchProvider = ComponentAccessor.getComponent(SearchProvider);
+  def query = jqlQueryParser.parseQuery(jqlQuery);
+  def searchQuery = SearchQuery.create(query, user);
+
+  def results = searchProvider.search(searchQuery, PagerFilter.getUnlimitedFilter());
+  log.warn "issue cnt: ${results.getTotal()}";
+  results.getResults().collect { res ->
+    def doc = res.getDocument();
+    def key = doc.get("key");
+    def issue = ComponentAccessor.getIssueManager().getIssueObject(key);
+    return issue;
+  }
+}
+
+def jqlQuery = "resolution = Unresolved ORDER BY priority DESC, updated DESC";
+def issues = findIssues(jqlQuery, 'zhxlp');
+
+
 ```
