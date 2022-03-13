@@ -88,6 +88,7 @@
   * [NSIS 脚本](windows/nsis-jiao-ben.md)
   * [使用QEMU运行ARM64 CentOS7](windows/shi-yong-qemu-yun-hang-arm64-centos7.md)
   * [DOS 脚本](windows/dos-jiao-ben.md)
+  * [Windows 11 设置旧版右键菜单](windows/windows-11-she-zhi-jiu-ban-you-jian-cai-dan.md)
 * [Apple](apple/README.md)
   * [AppStore 应用开发及上架](apple/appstore-ying-yong-kai-fa-ji-shang-jia.md)
   * [Apple 打包 Golang WebDav 制作 pkg 安装包](apple/apple-da-bao-golang-webdav-zhi-zuo-pkg-an-zhuang-bao.md)
