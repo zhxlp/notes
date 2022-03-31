@@ -12,3 +12,5 @@ Windows Registry Editor Version 5.00
 
 
 ```
+
+重启电脑
