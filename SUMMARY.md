@@ -126,3 +126,4 @@
   * [rbd-mirror](openstack/rbd-mirror.md)
 * [Other](other/README.md)
   * [华为一碰传标签制作](other/hua-wei-yi-peng-chuan-biao-qian-zhi-zuo.md)
+  * [常用软件](other/chang-yong-ruan-jian.md)
