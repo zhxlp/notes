@@ -33,6 +33,10 @@
 
 {% embed url="https://www.voidtools.com/zh-cn" %}
 
+### rdcman
+
+{% embed url="https://docs.microsoft.com/zh-cn/sysinternals/downloads/rdcman" %}
+
 ## 证书
 
 ### KeyStore Explorer
@@ -84,3 +88,13 @@
 ### Wireshark
 
 {% embed url="https://www.wireshark.org" %}
+
+## USB启动
+
+### Rufus
+
+{% embed url="https://rufus.ie/zh" %}
+
+### ventoy
+
+{% embed url="https://www.ventoy.net/cn/index.html" %}
