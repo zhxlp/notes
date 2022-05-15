@@ -4,7 +4,7 @@
 
 ### 工具
 
-[Etcher](https://etcher.io)
+[Etcher](https://etcher.io/)
 
 SD 卡
 

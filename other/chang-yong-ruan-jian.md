@@ -61,6 +61,10 @@
 
 {% embed url="https://nodejs.org/zh-cn" %}
 
+### Golang
+
+{% embed url="https://go.dev/dl/" %}
+
 ### postman
 
 {% embed url="https://www.postman.com" %}
@@ -72,6 +76,10 @@
 ### **Xmanager**
 
 {% embed url="https://www.netsarang.com/en/xmanager" %}
+
+### MinGW
+
+{% embed url="https://sourceforge.net/projects/mingw-w64/files/" %}
 
 ## 压缩
 
