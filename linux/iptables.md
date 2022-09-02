@@ -76,7 +76,7 @@
     ```
 *   数据经过防火墙的流程
 
-    ![iptables详解（1）：iptables概念](../.gitbook/assets/iptables-1.png)
+    <img src="../.gitbook/assets/iptables-1.png" alt="iptables详解（1）：iptables概念" data-size="original">
 
     ### 示例
 *   默认配置

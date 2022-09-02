@@ -2,350 +2,325 @@
 
 ## 准备
 
-- 文件说明
+*   文件说明
 
-  **chaincode**：链码文件夹,存放链码
+    **chaincode**：链码文件夹,存放链码
 
-  **crypto-config.yaml**：生成组织关系和身份证书配置文件
+    **crypto-config.yaml**：生成组织关系和身份证书配置文件
 
-  **configtx.yaml**：生成通道创世块或通道交易的配置文件
+    **configtx.yaml**：生成通道创世块或通道交易的配置文件
 
-  **docker-compose-zookeeper\*.yaml**：zookeeper 容器配置文件
+    **docker-compose-zookeeper\*.yaml**：zookeeper 容器配置文件
 
-  **docker-compose-kafka\*.yaml**：kafka 容器配置文件
+    **docker-compose-kafka\*.yaml**：kafka 容器配置文件
 
-  **docker-compose-orderer\*.yaml**：orderer 容器配置文件
+    **docker-compose-orderer\*.yaml**：orderer 容器配置文件
 
-  **docker-compose-org\*-peer\*.yaml**：peer 容器配置文件
+    **docker-compose-org\*-peer\*.yaml**：peer 容器配置文件
+*   拷贝文件到相应节点
 
-- 拷贝文件到相应节点
+    \[192.168.5.31]
 
-  [192.168.5.31]
+    <img src="../.gitbook/assets/1570863600270.png" alt="1570863600270" data-size="original">
 
-  ![1570863600270](../.gitbook/assets/1570863600270.png)
+    \[192.168.5.32]
 
-  [192.168.5.32]
+    <img src="../.gitbook/assets/1570863750616.png" alt="1570863750616" data-size="original">
 
-  ![1570863750616](../.gitbook/assets/1570863750616.png)
+    \[192.168.5.33]
 
-  [192.168.5.33]
+    <img src="../.gitbook/assets/1570863828028.png" alt="1570863828028" data-size="original">
+*   生成组织关系和身份证书
 
-  ![1570863828028](../.gitbook/assets/1570863828028.png)
+    <img src="../.gitbook/assets/1570862654861.png" alt="1570862654861" data-size="original">
 
-- 生成组织关系和身份证书
+    ```bash
+    cryptogen generate --config=./crypto-config.yaml
+    ```
 
-  ![1570862654861](../.gitbook/assets/1570862654861.png)
+    <img src="../.gitbook/assets/1570848247371.png" alt="1570848247371" data-size="original">
+*   配置`configtxgen`工具工作目录,目录中要存在`configtx.yaml`文件
 
-  ```bash
-  cryptogen generate --config=./crypto-config.yaml
-  ```
+    ```bash
+    export FABRIC_CFG_PATH=$PWD
+    mkdir channel-artifacts
+    ```
+*   生成创世区块
 
-  ![1570848247371](../.gitbook/assets/1570848247371.png)
+    ```bash
+    configtxgen -profile TwoOrgsOrdererGenesis -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block
+    ```
 
-- 配置`configtxgen`工具工作目录,目录中要存在`configtx.yaml`文件
+    <img src="../.gitbook/assets/1570701797814.png" alt="1570701797814" data-size="original">
+*   生成通道配置文件
 
-  ```bash
-  export FABRIC_CFG_PATH=$PWD
-  mkdir channel-artifacts
-  ```
+    ```bash
+    configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/mychannel.tx -channelID mychannel
+    ```
 
-- 生成创世区块
+    <img src="../.gitbook/assets/1570701834144.png" alt="1570701834144" data-size="original">
+*   生成锚节点配置文件
 
-  ```bash
-  configtxgen -profile TwoOrgsOrdererGenesis -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block
-  ```
+    ```bash
+    # Org1
+    configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID mychannel -asOrg Org1MSP
+    ```
 
-  ![1570701797814](../.gitbook/assets/1570701797814.png)
+    <img src="../.gitbook/assets/1570848420161.png" alt="1570848420161" data-size="original">
+*   拷贝`crypto-config`目录和`channel-artifacts`目录到其它机器
 
-- 生成通道配置文件
+    **crypto-config**：存放生成的组织关系和身份证书
 
-  ```bash
-  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/mychannel.tx -channelID mychannel
-  ```
+    **channel-artifacts**：存放创世区块和通道配置
+*   启动`zookeeper`服务
 
-  ![1570701834144](../.gitbook/assets/1570701834144.png)
+    \[192.168.5.31]
 
-- 生成锚节点配置文件
+    ```bash
+    docker-compose -f docker-compose-zookeeper0.yaml up -d
+    ```
 
-  ```bash
-  # Org1
-  configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID mychannel -asOrg Org1MSP
-  ```
+    \[192.168.5.32]
 
-  ![1570848420161](../.gitbook/assets/1570848420161.png)
+    ```bash
+    docker-compose -f docker-compose-zookeeper1.yaml up -d
+    ```
 
-- 拷贝`crypto-config`目录和`channel-artifacts`目录到其它机器
+    \[192.168.5.33]
 
-  **crypto-config**：存放生成的组织关系和身份证书
+    ```bash
+    docker-compose -f docker-compose-zookeeper2.yaml up -d
+    ```
+*   检查 zookeeper 集群状态
 
-  **channel-artifacts**：存放创世区块和通道配置
+    \[192.168.5.31]
 
-- 启动`zookeeper`服务
+    ```bash
+    docker exec -it zookeeper0 zkServer.sh status
+    ```
 
-  [192.168.5.31]
+    <img src="../.gitbook/assets/1570701974469.png" alt="1570701974469" data-size="original">
 
-  ```bash
-  docker-compose -f docker-compose-zookeeper0.yaml up -d
-  ```
+    \[192.168.5.32]
 
-  [192.168.5.32]
+    ```bash
+    docker exec -it zookeeper1 zkServer.sh status
+    ```
 
-  ```bash
-  docker-compose -f docker-compose-zookeeper1.yaml up -d
-  ```
+    <img src="../.gitbook/assets/1570758729106.png" alt="1570758729106" data-size="original">
 
-  [192.168.5.33]
+    \[192.168.5.33]
 
-  ```bash
-  docker-compose -f docker-compose-zookeeper2.yaml up -d
-  ```
+    ```bash
+    docker exec -it zookeeper2 zkServer.sh status
+    ```
 
-- 检查 zookeeper 集群状态
+    <img src="../.gitbook/assets/1570758790673.png" alt="1570758790673" data-size="original">
+*   启动 kafka 服务
 
-  [192.168.5.31]
+    \[192.168.5.31]
 
-  ```bash
-  docker exec -it zookeeper0 zkServer.sh status
-  ```
+    ```bash
+    docker-compose -f docker-compose-kafka0.yaml up -d
+    ```
 
-  ![1570701974469](../.gitbook/assets/1570701974469.png)
+    \[192.168.5.32]
 
-  [192.168.5.32]
+    ```bash
+    docker-compose -f docker-compose-kafka1.yaml up -d
+    ```
 
-  ```bash
-  docker exec -it zookeeper1 zkServer.sh status
-  ```
+    \[192.168.5.33]
 
-  ![1570758729106](../.gitbook/assets/1570758729106.png)
+    ```bash
+    docker-compose -f docker-compose-kafka2.yaml up -d
+    ```
+*   查看日志检查 kafka 服务
 
-  [192.168.5.33]
+    \[192.168.5.31]
 
-  ```bash
-  docker exec -it zookeeper2 zkServer.sh status
-  ```
+    ```bash
+    docker logs kafka0
+    ```
 
-  ![1570758790673](../.gitbook/assets/1570758790673.png)
+    <img src="../.gitbook/assets/1570702189145.png" alt="1570702189145" data-size="original">
 
-- 启动 kafka 服务
+    \[192.168.5.32]
 
-  [192.168.5.31]
+    ```bash
+    docker logs kafka1
+    ```
 
-  ```bash
-  docker-compose -f docker-compose-kafka0.yaml up -d
-  ```
+    <img src="../.gitbook/assets/1570759103692.png" alt="1570759103692" data-size="original">
 
-  [192.168.5.32]
+    \[192.168.5.33]
 
-  ```bash
-  docker-compose -f docker-compose-kafka1.yaml up -d
-  ```
+    ```bash
+    docker logs kafka2
+    ```
 
-  [192.168.5.33]
+    <img src="../.gitbook/assets/1570759155821.png" alt="1570759155821" data-size="original">
+*   启动 orderer 服务
 
-  ```bash
-  docker-compose -f docker-compose-kafka2.yaml up -d
-  ```
+    \[192.168.5.31]
 
-- 查看日志检查 kafka 服务
+    ```bash
+    docker-compose -f docker-compose-orderer0.yaml up -d
+    ```
 
-  [192.168.5.31]
+    \[192.168.5.32]
 
-  ```bash
-  docker logs kafka0
-  ```
+    ```bash
+    docker-compose -f docker-compose-orderer1.yaml up -d
+    ```
 
-  ![1570702189145](../.gitbook/assets/1570702189145.png)
+    \[192.168.5.33]
 
-  [192.168.5.32]
+    ```bash
+    docker-compose -f docker-compose-orderer2.yaml up -d
+    ```
+*   查看日志检查 orderer 服务
 
-  ```bash
-  docker logs kafka1
-  ```
+    \[192.168.5.31]
 
-  ![1570759103692](../.gitbook/assets/1570759103692.png)
+    ```bash
+    docker logs orderer0.example.com
+    ```
 
-  [192.168.5.33]
+    <img src="../.gitbook/assets/1570702358027.png" alt="1570702358027" data-size="original">
 
-  ```bash
-  docker logs kafka2
-  ```
+    \[192.168.5.32]
 
-  ![1570759155821](../.gitbook/assets/1570759155821.png)
+    ```bash
+    docker logs orderer1.example.com
+    ```
 
-- 启动 orderer 服务
+    <img src="../.gitbook/assets/1570702358027.png" alt="1570702358027" data-size="original">
 
-  [192.168.5.31]
+    \[192.168.5.33]
 
-  ```bash
-  docker-compose -f docker-compose-orderer0.yaml up -d
-  ```
+    ```bash
+    docker logs orderer2.example.com
+    ```
 
-  [192.168.5.32]
+    <img src="../.gitbook/assets/1570702358027.png" alt="1570702358027" data-size="original">
+*   启动 peer 服务
 
-  ```bash
-  docker-compose -f docker-compose-orderer1.yaml up -d
-  ```
+    \[192.168.5.31]
 
-  [192.168.5.33]
+    ```bash
+    docker-compose -f docker-compose-org1-peer0.yaml up -d
+    ```
 
-  ```bash
-  docker-compose -f docker-compose-orderer2.yaml up -d
-  ```
+    \[192.168.5.32]
 
-- 查看日志检查 orderer 服务
+    ```bash
+    docker-compose -f docker-compose-org1-peer1.yaml up -d
+    ```
 
-  [192.168.5.31]
+    \[192.168.5.33]
 
-  ```bash
-  docker logs orderer0.example.com
-  ```
+    ```bash
+    docker-compose -f docker-compose-org1-peer2.yaml up -d
+    ```
+*   查看 peer 日志
 
-  ![1570702358027](../.gitbook/assets/1570702358027.png)
+    \[192.168.5.31]
 
-  [192.168.5.32]
+    ```bash
+    docker logs peer0.org1.example.com
+    ```
 
-  ```bash
-  docker logs orderer1.example.com
-  ```
+    <img src="../.gitbook/assets/1570759923849.png" alt="1570759923849" data-size="original">
 
-  ![1570702358027](../.gitbook/assets/1570702358027.png)
+    \[192.168.5.32]
 
-  [192.168.5.33]
+    ```bash
+    docker logs peer1.org1.example.com
+    ```
 
-  ```bash
-  docker logs orderer2.example.com
-  ```
+    <img src="../.gitbook/assets/1570759923849.png" alt="1570759923849" data-size="original">
 
-  ![1570702358027](../.gitbook/assets/1570702358027.png)
+    \[192.168.5.33]
 
-- 启动 peer 服务
+    ```bash
+    docker logs peer2.org1.example.com
+    ```
 
-  [192.168.5.31]
+    <img src="../.gitbook/assets/1570759923849.png" alt="1570759923849" data-size="original">
+*   登录 cli 终端
 
-  ```bash
-  docker-compose -f docker-compose-org1-peer0.yaml up -d
-  ```
+    \[all]
 
-  [192.168.5.32]
+    ```bash
+    docker exec -it cli bash
+    ```
+*   配置 orderer 证书和通道环境变量
 
-  ```bash
-  docker-compose -f docker-compose-org1-peer1.yaml up -d
-  ```
+    \[all]
 
-  [192.168.5.33]
+    ```bash
+    export ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+    export CHANNEL_NAME=mychannel
+    ```
+*   创建通道
 
-  ```bash
-  docker-compose -f docker-compose-org1-peer2.yaml up -d
-  ```
+    \[192.168.5.31]
 
-- 查看 peer 日志
+    ```bash
+    peer channel create -o orderer0.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/mychannel.tx --tls --cafile $ORDERER_CA
+    mv mychannel.block channel-artifacts/
+    ```
 
-  [192.168.5.31]
+    <img src="../.gitbook/assets/1570717049063.png" alt="1570717049063" data-size="original">
+* 拷贝`channel-artifacts/mychannel.block`文件到其它节点的相同目录
+*   加入通道
 
-  ```bash
-  docker logs peer0.org1.example.com
-  ```
+    \[all]
 
-  ![1570759923849](../.gitbook/assets/1570759923849.png)
+    ```bash
+    peer channel join -b channel-artifacts/mychannel.block
+    ```
 
-  [192.168.5.32]
+    <img src="../.gitbook/assets/1570717109206.png" alt="1570717109206" data-size="original">
+*   更新锚点
 
-  ```bash
-  docker logs peer1.org1.example.com
-  ```
+    \[192.168.5.31]
 
-  ![1570759923849](../.gitbook/assets/1570759923849.png)
+    ```bash
+    peer channel update -o orderer0.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors.tx --tls true --cafile $ORDERER_CA
+    ```
 
-  [192.168.5.33]
+    <img src="../.gitbook/assets/1570717520379.png" alt="1570717520379" data-size="original">
+*   安装链码
 
-  ```bash
-  docker logs peer2.org1.example.com
-  ```
+    \[all]
 
-  ![1570759923849](../.gitbook/assets/1570759923849.png)
+    ```bash
+    peer chaincode install -n sacc -v 1.0 -l golang -p github.com/chaincode/sacc/
+    ```
 
-- 登录 cli 终端
+    <img src="../.gitbook/assets/1570849034098.png" alt="1570849034098" data-size="original">
+*   初始化链码
 
-  [all]
+    \[192.168.5.31]
 
-  ```bash
-  docker exec -it cli bash
-  ```
+    ```bash
+    peer chaincode instantiate -o orderer0.example.com:7050 --tls true --cafile $ORDERER_CA -C $CHANNEL_NAME -n sacc -l golang -v 1.0 -c '{"Args":["a","123456"]}'
+    ```
 
-- 配置 orderer 证书和通道环境变量
+    <img src="../.gitbook/assets/1570849182377.png" alt="1570849182377" data-size="original">
+*   查询数据
 
-  [all]
+    ```bash
+    peer chaincode query -C $CHANNEL_NAME -n sacc -c '{"Args":["get","a"]}'
+    ```
 
-  ```bash
-  export ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-  export CHANNEL_NAME=mychannel
-  ```
+    <img src="../.gitbook/assets/1570849531081.png" alt="1570849531081" data-size="original">
+*   修改数据
 
-- 创建通道
+    ```bash
+    peer chaincode invoke -o orderer0.example.com:7050 --tls true --cafile $ORDERER_CA -C $CHANNEL_NAME -n sacc -c '{"Args":["set","a","abcdef"]}'
+    ```
 
-  [192.168.5.31]
-
-  ```bash
-  peer channel create -o orderer0.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/mychannel.tx --tls --cafile $ORDERER_CA
-  mv mychannel.block channel-artifacts/
-  ```
-
-  ![1570717049063](../.gitbook/assets/1570717049063.png)
-
-- 拷贝`channel-artifacts/mychannel.block`文件到其它节点的相同目录
-
-- 加入通道
-
-  [all]
-
-  ```bash
-  peer channel join -b channel-artifacts/mychannel.block
-  ```
-
-  ![1570717109206](../.gitbook/assets/1570717109206.png)
-
-- 更新锚点
-
-  [192.168.5.31]
-
-  ```bash
-  peer channel update -o orderer0.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors.tx --tls true --cafile $ORDERER_CA
-  ```
-
-  ![1570717520379](../.gitbook/assets/1570717520379.png)
-
-- 安装链码
-
-  [all]
-
-  ```bash
-  peer chaincode install -n sacc -v 1.0 -l golang -p github.com/chaincode/sacc/
-  ```
-
-  ![1570849034098](../.gitbook/assets/1570849034098.png)
-
-- 初始化链码
-
-  [192.168.5.31]
-
-  ```bash
-  peer chaincode instantiate -o orderer0.example.com:7050 --tls true --cafile $ORDERER_CA -C $CHANNEL_NAME -n sacc -l golang -v 1.0 -c '{"Args":["a","123456"]}'
-  ```
-
-  ![1570849182377](../.gitbook/assets/1570849182377.png)
-
-- 查询数据
-
-  ```bash
-  peer chaincode query -C $CHANNEL_NAME -n sacc -c '{"Args":["get","a"]}'
-  ```
-
-  ![1570849531081](../.gitbook/assets/1570849531081.png)
-
-- 修改数据
-
-  ```bash
-  peer chaincode invoke -o orderer0.example.com:7050 --tls true --cafile $ORDERER_CA -C $CHANNEL_NAME -n sacc -c '{"Args":["set","a","abcdef"]}'
-  ```
-
-  ![1570849598247](../.gitbook/assets/1570849598247.png)
+    <img src="../.gitbook/assets/1570849598247.png" alt="1570849598247" data-size="original">
