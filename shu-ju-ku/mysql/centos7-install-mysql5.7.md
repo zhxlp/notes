@@ -2,7 +2,7 @@
 
 *   访问[mysql 官网](https://dev.mysql.com/downloads/repo/yum/)下载系统对应的 rpm 包,并上传系统。
 
-    <img src="../.gitbook/assets/1553360195405.png" alt="1553360195405" data-size="original">
+    <img src="../../.gitbook/assets/1553360195405.png" alt="1553360195405" data-size="original">
 *   安装 mysql 源仓库包。
 
     ```bash
@@ -21,9 +21,9 @@
     yum repolist enabled | grep mysql
     ```
 
-    <img src="../.gitbook/assets/1553361100646.png" alt="1553361100646" data-size="original">
+    <img src="../../.gitbook/assets/1553361100646.png" alt="1553361100646" data-size="original">
 
-    <img src="../.gitbook/assets/553361174736.png" alt="1553361174736" data-size="original">
+    <img src="../../.gitbook/assets/553361174736.png" alt="1553361174736" data-size="original">
 *   安装 MySQL
 
     ```bash
@@ -46,7 +46,7 @@
     grep 'temporary password' /var/log/mysqld.log
     ```
 
-    <img src="../.gitbook/assets/1553362337542.png" alt="1553362337542" data-size="original">
+    <img src="../../.gitbook/assets/1553362337542.png" alt="1553362337542" data-size="original">
 *   登录 mysql 并修改密码
 
     > 默认密码策略：至少 8 位，必须包含大小写字母、数字、特殊字符。
@@ -68,7 +68,7 @@
       show variables like 'validate_password%';
       ```
 
-      <img src="../.gitbook/assets/1553363714224.png" alt="1553363714224" data-size="original">
+      <img src="../../.gitbook/assets/1553363714224.png" alt="1553363714224" data-size="original">
   *   字段说明
 
       | 字段                                       | 说明        |
