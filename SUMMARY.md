@@ -2,6 +2,10 @@
 
 * [简介](README.md)
 * [Linux](linux/README.md)
+  * [Samba](linux/samba/README.md)
+    * [CentOS7安装Samba](linux/samba/centos7-samba.md)
+    * [配置](linux/samba/pei-zhi.md)
+    * [相关命令](linux/samba/xiang-guan-ming-ling.md)
   * [Systemd](linux/systemd.md)
   * [FPM 打包 nginx rpm 包](linux/fpm-da-bao-nginx-rpm-bao.md)
   * [rpm 打包-从二进制文件进行打包](linux/rpm-da-bao-cong-er-jin-zhi-wen-jian-jin-hang-da-bao.md)
@@ -13,7 +17,6 @@
   * [CentOS7 发送邮件](linux/centos7-fa-song-you-jian.md)
   * [CentOS7 安装 OpenVPN](linux/centos7-an-zhuang-openvpn.md)
   * [Linux 多线路由策略](linux/linux-duo-xian-lu-you-ce-lve.md)
-  * [CentOS7 Samba](linux/centos7-samba.md)
   * [Webmin 安装](linux/webmin-an-zhuang.md)
   * [NoVNC 安装](linux/novnc-an-zhuang.md)
   * [SSL 自签](linux/ssl-zi-qian.md)
