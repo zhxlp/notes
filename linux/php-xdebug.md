@@ -12,10 +12,11 @@
 
     ```properties
     zend_extension=xdebug.so
-    xdebug.remote_enable = 1
-    ; xdebug.remote_host=hostname_or_ip_of_the_dbgp_proxy_goes_here
+    xdebug.remote_enable = on
+    xdebug.remote_handler = dbgp
     xdebug.remote_host = 127.0.0.1
     xdebug.remote_port = 9001
+
     ```
 
 ## DBGp 代理
@@ -33,13 +34,50 @@
 
     ```bash
     export PYTHONPATH=$PYTHONPATH:`pwd`/python3lib:`pwd`/pythonlib
-    ./pydbgpproxy -d 127.0.0.1:9001 -i 10.8.0.1:9002
+    ./pydbgpproxy -d 127.0.0.1:9001 -i 0.0.0.0:9005
     ```
 
     <img src="../.gitbook/assets/image-20200516004018777.png" alt="image-20200516004018777" data-size="original">
-*   配置 IDE
 
-    <img src="../.gitbook/assets/image-20200516013927850.png" alt="image-20200516013927850" data-size="original">
-*   配置浏览器
+## PhpStorm配置
 
-    <img src="../.gitbook/assets/image-20200516014040467.png" alt="image-20200516014040467" data-size="original">
+
+
+<img src="../.gitbook/assets/image-20200516013927850.png" alt="image-20200516013927850" data-size="original">
+
+## VSCODE 配置
+
+编辑 `launch.json`
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for DBGp Proxy",
+      "type": "php",
+      "request": "launch",
+      "pathMappings": {
+        "/data/www/test": "${workspaceFolder}"
+      },
+      "proxy": {
+        "enable": true,
+        "host": "10.8.0.1",
+        "port": 9005,
+        "key": "zhxlp"
+      }
+    }
+  ]
+```
+
+## 配置浏览器
+
+### 方法一
+
+使用xdebug插件
+
+<img src="../.gitbook/assets/image-20200516014040467.png" alt="image-20200516014040467" data-size="original">
+
+方法二
+
+使用url参数 `?XDEBUG_SESSION_START=zhxlp`
