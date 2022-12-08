@@ -2,9 +2,12 @@
 
 * [简介](README.md)
 * [Linux](linux/README.md)
+  * [Ubuntu](linux/ubuntu/README.md)
+    * [Ubuntu 20.04 ARM64 修改PAGE\_SIZE 64k](linux/ubuntu/ubuntu-20.04-arm64-xiu-gai-pagesize-64k.md)
   * [Samba](linux/samba/README.md)
     * [CentOS7安装Samba](linux/samba/centos7-samba.md)
-    * [配置](linux/samba/pei-zhi.md)
+    * [简单案例](linux/samba/jian-dan-an-li.md)
+    * [审计](linux/samba/shen-ji.md)
     * [相关命令](linux/samba/xiang-guan-ming-ling.md)
   * [Systemd](linux/systemd.md)
   * [FPM 打包 nginx rpm 包](linux/fpm-da-bao-nginx-rpm-bao.md)

@@ -1,75 +1,71 @@
-# OpenStack RBD 导入镜像
+# OpenStack-RBD 导入镜像
 
 ## 方法 1
 
-- 使用命令导入假镜像
+*   使用命令导入假镜像
 
-  ```bash
-  openstack image create "Ubuntu18.04" \
-  --file ~/cirros-0.4.0-x86_64-disk.img \
-  --disk-format raw --container-format bare \
-  --property hw_scsi_model=virtio-scsi \
-  --property hw_disk_bus=scsi \
-  --property hw_qemu_guest_agent=yes \
-  --property os_require_quiesce=yes \
-  --property os_type=linux \
-  --property os_admin_user=root \
-  --min-disk 20 \
-  --min-ram 2048 \
-  --public
+    ```bash
+    openstack image create "Ubuntu18.04" \
+    --file ~/cirros-0.4.0-x86_64-disk.img \
+    --disk-format raw --container-format bare \
+    --property hw_scsi_model=virtio-scsi \
+    --property hw_disk_bus=scsi \
+    --property hw_qemu_guest_agent=yes \
+    --property os_require_quiesce=yes \
+    --property os_type=linux \
+    --property os_admin_user=root \
+    --min-disk 20 \
+    --min-ram 2048 \
+    --public
 
-  # ................
-  # id | ef85323a-c0f1-4452-922c-bdb8592fddde
-  # .................
-  ```
+    # ................
+    # id | ef85323a-c0f1-4452-922c-bdb8592fddde
+    # .................
+    ```
+*   rbd 导入
 
-- rbd 导入
+    ```bash
+    # 解除快照保护
+    rbd snap unprotect images/ef85323a-c0f1-4452-922c-bdb8592fddde@snap
+    # 删除快照
+    rbd snap rm images/ef85323a-c0f1-4452-922c-bdb8592fddde@snap
+    # 删除镜像
+    rbd rm images/ef85323a-c0f1-4452-922c-bdb8592fddde
+    # 导入镜像 ubuntu18.04.raw
+    rbd import ubuntu16.04.raw images/ef85323a-c0f1-4452-922c-bdb8592fddde
+    # 创建快照
+    rbd snap create images/ef85323a-c0f1-4452-922c-bdb8592fddde@snap
+    # 保护快照
+    rbd snap protect images/ef85323a-c0f1-4452-922c-bdb8592fddde@snap
+    ```
+*   计算镜像`md5`和`sha512`值
 
-  ```bash
-  # 解除快照保护
-  rbd snap unprotect images/ef85323a-c0f1-4452-922c-bdb8592fddde@snap
-  # 删除快照
-  rbd snap rm images/ef85323a-c0f1-4452-922c-bdb8592fddde@snap
-  # 删除镜像
-  rbd rm images/ef85323a-c0f1-4452-922c-bdb8592fddde
-  # 导入镜像 ubuntu18.04.raw
-  rbd import ubuntu16.04.raw images/ef85323a-c0f1-4452-922c-bdb8592fddde
-  # 创建快照
-  rbd snap create images/ef85323a-c0f1-4452-922c-bdb8592fddde@snap
-  # 保护快照
-  rbd snap protect images/ef85323a-c0f1-4452-922c-bdb8592fddde@snap
+    ```bash
+    # 计算md5值
+    md5sum ubuntu18.04.raw
+    # ba3cd24377dde5dfdd58728894004abb    ubuntu18.04.raw
 
-  ```
+    # 计算 sha512值
+    sha512sum ubuntu18.04.raw
+    # b795f047a1b10ba0b7c95b43b2a481a59289dc4cf2e49845e60b194a911819d3ada03767bbba4143b44c93fd7f66c96c5a621e28dff51d1196dae64974ce240e   ubuntu18.04.raw
+    ```
+*   连接数据库，更新数据
 
-- 计算镜像`md5`和`sha512`值
-
-  ```bash
-  # 计算md5值
-  md5sum ubuntu18.04.raw
-  # ba3cd24377dde5dfdd58728894004abb    ubuntu18.04.raw
-
-  # 计算 sha512值
-  sha512sum ubuntu18.04.raw
-  # b795f047a1b10ba0b7c95b43b2a481a59289dc4cf2e49845e60b194a911819d3ada03767bbba4143b44c93fd7f66c96c5a621e28dff51d1196dae64974ce240e   ubuntu18.04.raw
-  ```
-
-- 连接数据库，更新数据
-
-  ```sql
-  UPDATE `glance`.`images`
-  -- 镜像大小
-  SET `size` = 21474836480,
-  -- 镜像md5值
-  `checksum` = '7324c73bee3216b5c7a9d27370eb1774',
-  -- sha512 校验
-  `os_hash_algo` = 'sha512',
-  `os_hash_value` = '5ee4ca048ef161f661cf308654cc7e7bdcb9af6905447c1b098aa3df09a27fd8468ee7573f3e092051422c07e6ee67fb1aab5119172c06d551005b5192562778'
-  WHERE `id` = 'ef85323a-c0f1-4452-922c-bdb8592fddde';
-  ```
+    ```sql
+    UPDATE `glance`.`images`
+    -- 镜像大小
+    SET `size` = 21474836480,
+    -- 镜像md5值
+    `checksum` = '7324c73bee3216b5c7a9d27370eb1774',
+    -- sha512 校验
+    `os_hash_algo` = 'sha512',
+    `os_hash_value` = '5ee4ca048ef161f661cf308654cc7e7bdcb9af6905447c1b098aa3df09a27fd8468ee7573f3e092051422c07e6ee67fb1aab5119172c06d551005b5192562778'
+    WHERE `id` = 'ef85323a-c0f1-4452-922c-bdb8592fddde';
+    ```
 
 ## 方法 2
 
-- 导入脚本
+* 导入脚本
 
 ```bash
 #!/bin/bash
@@ -112,5 +108,4 @@ echo "INSERT INTO glance.image_properties(image_id, name, value, created_at, upd
 echo "INSERT INTO glance.image_properties(image_id, name, value, created_at, updated_at, deleted) VALUES ('$IMAGE_ID', 'os_admin_user', '$OS_ADMIN_USER', now(), now(), 0);"
 echo "INSERT INTO glance.image_properties(image_id, name, value, created_at, updated_at, deleted) VALUES ('$IMAGE_ID', 'login_name', '$LOGIN_NAME', now(), now(), 0);"
 echo "INSERT INTO glance.image_properties(image_id, name, value, created_at, updated_at, deleted) VALUES ('$IMAGE_ID', 'login_password', '$LOGIN_PASSWORD', now(), now(), 0);"
-
 ```

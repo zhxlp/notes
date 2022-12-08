@@ -2,48 +2,46 @@
 
 ## 语法
 
-- 创建或修改触发器
+*   创建或修改触发器
 
-  ```sql
-  -- 表或视图的INSERT、UPDATE或DELETE语句的触发器（DML触发器）
+    ```sql
+    -- 表或视图的INSERT、UPDATE或DELETE语句的触发器（DML触发器）
 
-  { CREATE | ALTER } TRIGGER [ schema_name . ]trigger_name
-  -- schema_name: DML 触发器所属架构的名称,一般不使用
-  -- trigger_name: 触发器的名称。 一般由字母、数字、下划线构成,长度128字符以内
-  ON { table | view }
-  -- table: 表触发器,填写数据库表名
-  -- view: 视图触发器,填写视图名
-  [ WITH <dml_trigger_option> [ ,...n ] ]
-  -- dml_trigger_option: 触发器高级选项,例:ENCRYPTION,加密触发器语句
-  { FOR | AFTER | INSTEAD OF }
-  -- FOR: 后触发,仅当触发 SQL 语句中指定的所有操作都已成功启动时，DML 触发器才触发。 所有引用级联操作和约束检查也必须在此触发器触发前成功启动。
-  -- AFTER: 与FOR同义,但无法对视图定义 AFTER 触发器
-  -- INSTEAD OF: 替代触发器,用来代替通常的触发动作,系统不是直接对表执行这些操作,而是把操作内容交给触发器,因为INSTEAD OF 触发器的动作要早于表的约束处理。每个INSERT、UPDATE 或 DELETE 语句只能有一个 INSTEAD OF 触发器
-  { [ INSERT ] [ , ] [ UPDATE ] [ , ] [ DELETE ] }
-  -- INSERT: 插入时触发
-  -- UPDATE: 更新时触发
-  -- DELETE: 删除时触发
-  [ WITH APPEND ]
-  [ NOT FOR REPLICATION ]
-  -- NOT FOR REPLICATION: 当复制进程更改触发器所涉及的表时,不要执行该触发器
-  AS
-  -- 触发语句,触发器可以包含任意数量和类型的 Transact-SQL 语句
-  ```
+    { CREATE | ALTER } TRIGGER [ schema_name . ]trigger_name
+    -- schema_name: DML 触发器所属架构的名称,一般不使用
+    -- trigger_name: 触发器的名称。 一般由字母、数字、下划线构成,长度128字符以内
+    ON { table | view }
+    -- table: 表触发器,填写数据库表名
+    -- view: 视图触发器,填写视图名
+    [ WITH <dml_trigger_option> [ ,...n ] ]
+    -- dml_trigger_option: 触发器高级选项,例:ENCRYPTION,加密触发器语句
+    { FOR | AFTER | INSTEAD OF }
+    -- FOR: 后触发,仅当触发 SQL 语句中指定的所有操作都已成功启动时，DML 触发器才触发。 所有引用级联操作和约束检查也必须在此触发器触发前成功启动。
+    -- AFTER: 与FOR同义,但无法对视图定义 AFTER 触发器
+    -- INSTEAD OF: 替代触发器,用来代替通常的触发动作,系统不是直接对表执行这些操作,而是把操作内容交给触发器,因为INSTEAD OF 触发器的动作要早于表的约束处理。每个INSERT、UPDATE 或 DELETE 语句只能有一个 INSTEAD OF 触发器
+    { [ INSERT ] [ , ] [ UPDATE ] [ , ] [ DELETE ] }
+    -- INSERT: 插入时触发
+    -- UPDATE: 更新时触发
+    -- DELETE: 删除时触发
+    [ WITH APPEND ]
+    [ NOT FOR REPLICATION ]
+    -- NOT FOR REPLICATION: 当复制进程更改触发器所涉及的表时,不要执行该触发器
+    AS
+    -- 触发语句,触发器可以包含任意数量和类型的 Transact-SQL 语句
+    ```
+*   禁用触发器
 
-- 禁用触发器
+    ```sql
+    ALTER TABLE tabla_name DISABLE TRIGGER trigger_name
+    -- tabla_name: 数据库表名
+    -- trigger_name: 触发器名
+    ```
+*   删除触发器
 
-  ```sql
-  ALTER TABLE tabla_name DISABLE TRIGGER trigger_name
-  -- tabla_name: 数据库表名
-  -- trigger_name: 触发器名
-  ```
-
-- 删除触发器
-
-  ```sql
-  DROP TRIGGER trigger_name
-  -- trigger_name: 触发器名
-  ```
+    ```sql
+    DROP TRIGGER trigger_name
+    -- trigger_name: 触发器名
+    ```
 
 ## INSERTED 表和 DELETED 表
 
@@ -67,79 +65,25 @@ For 和 After 触发器工作流程图
 
 ## 示例
 
-<table  border="1" cellspacing="0">
-<thead style="text-align: center;">
-  <tr>
-    <th colspan="2">用户表(User)</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>id</td>
-    <td>用户编号,主键</td>
-  </tr>
-  <tr>
-    <td>user_name</td>
-    <td>用户名</td>
-  </tr>
-  <tr>
-    <td>phone</td>
-    <td>电话</td>
-  </tr>
-</tbody>
-</table>
+| 用户表(User)  |         |
+| ---------- | ------- |
+| id         | 用户编号,主键 |
+| user\_name | 用户名     |
+| phone      | 电话      |
 
-<table  border="1" cellspacing="0">
-<thead style="text-align: center;">
-  <tr>
-    <th colspan="2">书籍信息(BookInfo)</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>id</td>
-    <td>书籍编号,主键</td>
-  </tr>
-  <tr>
-    <td>book_name</td>
-    <td>书籍名</td>
-  </tr>
-  <tr>
-    <td>price</td>
-    <td>单价</td>
-  </tr>
-</tbody>
-</table>
+| 书籍信息(BookInfo) |         |
+| -------------- | ------- |
+| id             | 书籍编号,主键 |
+| book\_name     | 书籍名     |
+| price          | 单价      |
 
-<table  border="1" cellspacing="0">
-<thead style="text-align: center;">
-  <tr>
-    <th colspan="2">订单(Order)</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>id</td>
-    <td>订单编号,主键</td>
-  </tr>
-  <tr>
-    <td>user_id</td>
-    <td>用户ID</td>
-  </tr>
-  <tr>
-    <td>book_id</td>
-    <td>书籍ID</td>
-  </tr>
-  <tr>
-    <td>number</td>
-    <td>数量</td>
-  </tr>
-  <tr>
-    <td>price</td>
-    <td>总价</td>
-  </tr>
-</tbody>
-</table>
+| 订单(Order) |         |
+| --------- | ------- |
+| id        | 订单编号,主键 |
+| user\_id  | 用户ID    |
+| book\_id  | 书籍ID    |
+| number    | 数量      |
+| price     | 总价      |
 
 ![image-20200516173959725](../.gitbook/assets/image-20200516173959725.png)
 
@@ -197,56 +141,55 @@ FROM
 	[Order]
 	LEFT JOIN [User] ON [Order].[user_id] = [User].[id]
 	LEFT JOIN [BookInfo] ON [Order].[book_id] = [BookInfo].[id]
-
 ```
 
 ![image-20200516181851819](../.gitbook/assets/image-20200516181851819.png)
 
-- 在 Order 表创建触发器`update_order_price_trigger`,用于计算正确总价
+*   在 Order 表创建触发器`update_order_price_trigger`,用于计算正确总价
 
-  **尽量不要使用游标,游标性能差**
+    **尽量不要使用游标,游标性能差**
 
-  例 1：使用游标
+    例 1：使用游标
 
-  ```sql
-  CREATE TRIGGER update_order_price_trigger ON [Order]
-  FOR INSERT,UPDATE
-  AS
-  BEGIN
-    DECLARE @id1 INT
-    -- 定义游标
-  DECLARE cursor1 CURSOR FOR
-      SELECT [id] FROM [inserted]
-    -- 打开游标
-    OPEN cursor1
-    -- 获取第一行数据
-    FETCH NEXT  FROM cursor1 INTO @id1
-    -- 通过判断@@FETCH_STATUS进行循环
-    WHILE @@FETCH_STATUS = 0
+    ```sql
+    CREATE TRIGGER update_order_price_trigger ON [Order]
+    FOR INSERT,UPDATE
+    AS
     BEGIN
-      UPDATE [Order]
-  		SET [Order].[price] = [Order].[number] * [BookInfo].[Price]
-      FROM [Order]
-      LEFT JOIN [BookInfo] ON [Order].[book_id] = [BookInfo].[id]
-      WHERE [Order].[id] =@id1
-  		-- 获取下一行数据
-      FETCH NEXT FROM cursor1 INTO @id1
+      DECLARE @id1 INT
+      -- 定义游标
+    DECLARE cursor1 CURSOR FOR
+        SELECT [id] FROM [inserted]
+      -- 打开游标
+      OPEN cursor1
+      -- 获取第一行数据
+      FETCH NEXT  FROM cursor1 INTO @id1
+      -- 通过判断@@FETCH_STATUS进行循环
+      WHILE @@FETCH_STATUS = 0
+      BEGIN
+        UPDATE [Order]
+    		SET [Order].[price] = [Order].[number] * [BookInfo].[Price]
+        FROM [Order]
+        LEFT JOIN [BookInfo] ON [Order].[book_id] = [BookInfo].[id]
+        WHERE [Order].[id] =@id1
+    		-- 获取下一行数据
+        FETCH NEXT FROM cursor1 INTO @id1
+      END
+      CLOSE cursor1
+      DEALLOCATE cursor1
     END
-    CLOSE cursor1
-    DEALLOCATE cursor1
-  END
-  ```
+    ```
 
-  例 2:不使用游标
+    例 2:不使用游标
 
-  ```sql
-  CREATE TRIGGER update_order_price_trigger ON [Order]
-  FOR INSERT,UPDATE
-  AS
-  BEGIN
-    UPDATE [Order] SET [Order].[price] = [Order].[number] * [BookInfo].[Price]
-    FROM [inserted]
-  	LEFT JOIN [Order] ON [inserted].[id] = [Order].[id]
-  	LEFT JOIN [BookInfo] ON [Order].[book_id] = [BookInfo].[id]
-  END
-  ```
+    ```sql
+    CREATE TRIGGER update_order_price_trigger ON [Order]
+    FOR INSERT,UPDATE
+    AS
+    BEGIN
+      UPDATE [Order] SET [Order].[price] = [Order].[number] * [BookInfo].[Price]
+      FROM [inserted]
+    	LEFT JOIN [Order] ON [inserted].[id] = [Order].[id]
+    	LEFT JOIN [BookInfo] ON [Order].[book_id] = [BookInfo].[id]
+    END
+    ```

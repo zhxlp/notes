@@ -204,5 +204,4 @@ videoplaybackmode:i:value
 
 # 定义与包含此设置的RDP文件关联的RemoteApp和桌面ID
 workspaceid:s:value
-
 ```

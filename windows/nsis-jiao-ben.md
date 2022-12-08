@@ -19,7 +19,6 @@ VIAddVersionKey  /LANG=${LANG_SimpChinese} "LegalCopyright" "Copyright (c) 2016-
 VIAddVersionKey  /LANG=${LANG_SimpChinese} "FileDescription" "测试" ;文件描述
 VIAddVersionKey  /LANG=${LANG_SimpChinese} "FileVersion" "${PRODUCT_VERSION}" ;文件版本
 VIAddVersionKey  /LANG=${LANG_SimpChinese} "ProductVersion" "${PRODUCT_VERSION}" ;产品版本
-
 ```
 
 ## 单文件可执行文件
@@ -50,7 +49,6 @@ Section MainSection
   File /r "file\*.*"
   ExecShell "open" "$INSTDIR\zhxlp.exe"
 SectionEnd
-
 ```
 
 ## 设置卸载信息
@@ -149,5 +147,4 @@ Function un.onInit
     MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 $MyMsgBeforeRemove IDYES +2
     Abort   ; 立刻退出
 FunctionEnd
-
 ```

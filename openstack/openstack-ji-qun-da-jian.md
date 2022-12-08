@@ -14,7 +14,7 @@ controller3 192.168.2.23
 
 配置 hosts
 
-[all]
+\[all]
 
 ```bash
 echo '
@@ -29,19 +29,19 @@ cat /etc/hosts
 
 设置主机名
 
-[controller1]
+\[controller1]
 
 ```bash
 hostnamectl set-hostname controller1
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 hostnamectl set-hostname controller2
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 hostnamectl set-hostname controller3
@@ -49,7 +49,7 @@ hostnamectl set-hostname controller3
 
 ## 配置本地源
 
-[all]
+\[all]
 
 ```bash
 mkdir /etc/yum.repos.d/bak
@@ -85,7 +85,7 @@ yum clean all
 
 个节点主机相互放行
 
-[all]
+\[all]
 
 ```bash
 firewall-cmd --permanent --zone=trusted --add-source=192.168.2.20 --add-source=192.168.2.21 --add-source=192.168.2.22 --add-source=192.168.2.23
@@ -94,7 +94,7 @@ firewall-cmd --reload
 
 ## 配置 controller1 免密登录其他节点
 
-[controller1]
+\[controller1]
 
 ```bash
 ssh-keygen && \
@@ -107,7 +107,7 @@ ssh-copy-id root@controller3
 
 更改 SELinux 运行模式
 
-[all]
+\[all]
 
 ```bash
 sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/sysconfig/selinux
@@ -119,7 +119,7 @@ getenforce
 
 启用 OpenStack 源,安装 Openstack Clinet，Openstack Utils，openstack-selinux，更新软件包并重启服务器。
 
-[all]
+\[all]
 
 ```bash
 yum install -y centos-release-openstack-newton && \
@@ -134,7 +134,7 @@ reboot
 
 设置时区
 
-[all]
+\[all]
 
 ```bash
 timedatectl set-timezone "Asia/Shanghai"
@@ -142,7 +142,7 @@ timedatectl set-timezone "Asia/Shanghai"
 
 在个节点安装`chrony`设置开机自启并启动。
 
-[all]
+\[all]
 
 ```bash
 yum install -y chrony && \
@@ -156,7 +156,7 @@ systemctl enable chronyd.service
 
 安装软件包，设置开机自启并启动。
 
-[all]
+\[all]
 
 ```bash
 yum install -y pacemaker pcs resource-agents && \
@@ -168,13 +168,13 @@ systemctl enable pcsd.service
 
 设置**pcs**所需的身份验证
 
-[all]
+\[all]
 
 ```bash
 echo hacluster | passwd --stdin hacluster
 ```
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs cluster auth controller1 controller2 controller3 -u hacluster -p hacluster --force
@@ -182,7 +182,7 @@ pcs cluster auth controller1 controller2 controller3 -u hacluster -p hacluster -
 
 创建集群
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs cluster setup --force --name openstack controller1 controller2 controller3
@@ -190,7 +190,7 @@ pcs cluster setup --force --name openstack controller1 controller2 controller3
 
 ### 设置自启并启动集群
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs cluster start --all
@@ -200,7 +200,7 @@ pcs cluster enable --all
 
 ### 设置群集选项
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs property set stonith-enabled=false
@@ -209,7 +209,7 @@ pcs property set no-quorum-policy=ignore
 
 ### 创建 vip
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs resource create controller-vip IPaddr2 ip=192.168.2.20 cidr_netmask=24 nic=ens3 op monitor interval=3s
@@ -217,7 +217,7 @@ pcs resource create controller-vip IPaddr2 ip=192.168.2.20 cidr_netmask=24 nic=e
 
 ### 查看集群状态
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs status
@@ -227,7 +227,7 @@ pcs status
 
 安装软件包
 
-[all]
+\[all]
 
 ```bash
 yum install -y haproxy
@@ -235,7 +235,7 @@ yum install -y haproxy
 
 修复配置文件
 
-[all]
+\[all]
 
 ```bash
 cat > /etc/haproxy/haproxy.cfg << EOF
@@ -278,7 +278,7 @@ EOF
 
 配置内核参数以允许非本地 IP 绑定
 
-[all]
+\[all]
 
 ```bash
 echo 'net.ipv4.ip_nonlocal_bind = 1' >> /etc/sysctl.conf
@@ -287,7 +287,7 @@ sysctl -p
 
 将 HAProxy 添加到群集并确保 VIP 只能在 HAProxy 处于活动状态的计算机上运行
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs resource create haproxy systemd:haproxy --clone
@@ -297,7 +297,7 @@ pcs constraint colocation add haproxy-clone with controller-vip
 
 防火墙放行
 
-[all]
+\[all]
 
 ```bash
 firewall-cmd --permanent --add-port=8888/tcp
@@ -306,15 +306,13 @@ firewall-cmd --reload
 
 验证
 
-浏览器访问: http://192.168.2.20:8888/admin
-用户名：admin
-密码：123456
+浏览器访问: http://192.168.2.20:8888/admin 用户名：admin 密码：123456
 
 ## MariaDB Galera Cluster
 
 ### 安装软件包
 
-[all]
+\[all]
 
 ```bash
 yum install -y mariadb mariadb-galera-server mariadb-galera-common galera rsync
@@ -324,7 +322,7 @@ yum install -y mariadb mariadb-galera-server mariadb-galera-common galera rsync
 
 在`controller1`节点对数据进行安全配置。
 
-[controller1]
+\[controller1]
 
 ```bash
 systemctl restart mariadb.service && \
@@ -334,7 +332,7 @@ systemctl stop mariadb.service
 
 修改配置文件
 
-[controller1]
+\[controller1]
 
 ```bash
 cat > /etc/my.cnf.d/openstack.cnf << EOF
@@ -355,7 +353,7 @@ wsrep_node_address = 192.168.2.21
 EOF
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 cat > /etc/my.cnf.d/openstack.cnf << EOF
@@ -376,7 +374,7 @@ wsrep_node_address = 192.168.2.22
 EOF
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 cat > /etc/my.cnf.d/openstack.cnf << EOF
@@ -399,19 +397,19 @@ EOF
 
 ### 启动集群
 
-[controller1]
+\[controller1]
 
 ```bash
 galera_new_cluster
 ```
 
-[other]
+\[other]
 
 ```bash
 systemctl restart mariadb.service
 ```
 
-[all]
+\[all]
 
 ```bash
 systemctl enable mariadb.service
@@ -429,7 +427,7 @@ mysql -uroot -p -e 'SHOW STATUS LIKE "wsrep%";'
 
 创建`haproxy`用户。
 
-[controller1]
+\[controller1]
 
 ```bash
 mysql -uroot -p -e 'CREATE USER "haproxy"@"%" IDENTIFIED WITH "";'
@@ -437,7 +435,7 @@ mysql -uroot -p -e 'CREATE USER "haproxy"@"%" IDENTIFIED WITH "";'
 
 修改 haproxy 配置文件
 
-[all]
+\[all]
 
 ```bash
 cat >> /etc/haproxy/haproxy.cfg << EOF
@@ -454,7 +452,7 @@ EOF
 
 重启`haproxy`
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs resource restart haproxy
@@ -464,7 +462,7 @@ pcs resource restart haproxy
 
 连接 vip 地址数据库
 
-[all]
+\[all]
 
 ```bash
 mysql -uhaproxy -h 192.168.2.20 -e 'show databases;'
@@ -474,7 +472,7 @@ mysql -uhaproxy -h 192.168.2.20 -e 'show databases;'
 
 安装软件包
 
-[all]
+\[all]
 
 ```bash
 yum install -y rabbitmq-server
@@ -482,7 +480,7 @@ yum install -y rabbitmq-server
 
 配置监听 IP
 
-[controller1]
+\[controller1]
 
 ```bash
 cat > /etc/rabbitmq/rabbitmq-env.conf << EOF
@@ -490,7 +488,7 @@ RABBITMQ_NODE_IP_ADDRESS=192.168.2.21
 EOF
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 cat > /etc/rabbitmq/rabbitmq-env.conf << EOF
@@ -498,7 +496,7 @@ RABBITMQ_NODE_IP_ADDRESS=192.168.2.22
 EOF
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 cat > /etc/rabbitmq/rabbitmq-env.conf << EOF
@@ -508,7 +506,7 @@ EOF
 
 单个节点启动，并将 cookie 负责给其他节点
 
-[controller1]
+\[controller1]
 
 ```bash
 systemctl enable rabbitmq-server.service && \
@@ -519,7 +517,7 @@ scp /var/lib/rabbitmq/.erlang.cookie root@controller3:/var/lib/rabbitmq/.erlang.
 
 在其它节点，修改 cookie 文件所有者及权限，设置 rabbitmq 开机自启并启动
 
-[other]
+\[other]
 
 ```bash
 chown rabbitmq:rabbitmq /var/lib/rabbitmq/.erlang.cookie && \
@@ -530,7 +528,7 @@ systemctl restart rabbitmq-server.service
 
 除第一个节点外，在每个节点上运行以下命令
 
-[other]
+\[other]
 
 ```bash
 rabbitmqctl stop_app && \
@@ -546,14 +544,13 @@ rabbitmqctl cluster_status
 
 要确保在所有正在运行的节点上镜像除具有自动生成的名称的队列之外的所有队列，请`ha-mode`通过在其中一个节点上运行以下命令将策略密钥设置为 all：
 
-[controller1]
+\[controller1]
 
 ```bash
 rabbitmqctl set_policy ha-all '^(?!amq\.).*' '{"ha-mode": "all"}'
 ```
 
-创建`openstack`用户并设置权限。
-[controller1]
+创建`openstack`用户并设置权限。 \[controller1]
 
 ```bash
 rabbitmqctl add_user openstack RABBIT_PASS
@@ -563,7 +560,7 @@ rabbitmqctl set_permissions openstack ".*" ".*" ".*"
 
 验证
 
-[all]
+\[all]
 
 ```bash
 rabbitmqctl authenticate_user openstack RABBIT_PASS
@@ -573,7 +570,7 @@ rabbitmqctl authenticate_user openstack RABBIT_PASS
 
 安装软件包
 
-[all]
+\[all]
 
 ```bash
 yum install -y memcached python-memcached
@@ -581,19 +578,19 @@ yum install -y memcached python-memcached
 
 修改配置文件
 
-[controller1]
+\[controller1]
 
 ```bash
 sed -i 's/^OPTIONS=\".*\"$/OPTIONS="-l 127.0.0.1,::1,192.168.2.21"/g' /etc/sysconfig/memcached
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 sed -i 's/^OPTIONS=\".*\"$/OPTIONS="-l 127.0.0.1,::1,192.168.2.22"/g' /etc/sysconfig/memcached
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 sed -i 's/^OPTIONS=\".*\"$/OPTIONS="-l 127.0.0.1,::1,192.168.2.23"/g' /etc/sysconfig/memcached
@@ -601,7 +598,7 @@ sed -i 's/^OPTIONS=\".*\"$/OPTIONS="-l 127.0.0.1,::1,192.168.2.23"/g' /etc/sysco
 
 设置开机自启并启动
 
-[all]
+\[all]
 
 ```bash
 systemctl restart memcached.service
@@ -615,7 +612,7 @@ systemctl status memcached.service
 
 在单个节点操作即可。
 
-[controller1]
+\[controller1]
 
 使用数据库访问客户端以`root`用户身份连接到数据库服务器 ：
 
@@ -639,7 +636,7 @@ EXIT;
 
 安装软件包
 
-[ALL]
+\[ALL]
 
 ```bash
 yum install -y openstack-keystone httpd mod_wsgi
@@ -647,7 +644,7 @@ yum install -y openstack-keystone httpd mod_wsgi
 
 修改配置文件
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/keystone/keystone.conf 'database' 'connection' 'mysql+pymysql://keystone:KEYSTONE_DBPASS@controller/keystone'
@@ -659,7 +656,7 @@ openstack-config --set /etc/keystone/keystone.conf 'cache' 'memcache_servers' 'c
 
 初始化数据库
 
-[controller1]
+\[controller1]
 
 ```bash
 su -s /bin/sh -c "keystone-manage db_sync" keystone
@@ -667,7 +664,7 @@ su -s /bin/sh -c "keystone-manage db_sync" keystone
 
 初始化 Fernet 密钥存储库
 
-[controller1]
+\[controller1]
 
 ```bash
 keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
@@ -676,7 +673,7 @@ keystone-manage credential_setup --keystone-user keystone --keystone-group keyst
 
 拷贝 Fernet 密钥存储库
 
-[controller1]
+\[controller1]
 
 ```bash
 scp -r /etc/keystone/fernet-keys/ /etc/keystone/credential-keys/ root@192.168.2.22:/etc/keystone/
@@ -685,7 +682,7 @@ scp -r /etc/keystone/fernet-keys/ /etc/keystone/credential-keys/ root@192.168.2.
 
 设置 Fernet 密钥存储库文件权限
 
-[all]
+\[all]
 
 ```bash
 chown -R keystone:keystone /etc/keystone/credential-keys/
@@ -694,7 +691,7 @@ chown -R keystone:keystone /etc/keystone/fernet-keys/
 
 引导身份服务
 
-[controller1]
+\[controller1]
 
 ```bash
 keystone-manage bootstrap --bootstrap-password ADMIN_PASS \
@@ -706,7 +703,7 @@ keystone-manage bootstrap --bootstrap-password ADMIN_PASS \
 
 配置`wsgi-keystone.conf和httpd.conf`
 
-[controller1]
+\[controller1]
 
 ```bash
 sed -i 's/^Listen.*5000$/Listen 192.168.2.21:5000/g' /usr/share/keystone/wsgi-keystone.conf
@@ -714,7 +711,7 @@ sed -i 's/^Listen.*35357$/Listen 192.168.2.21:35357/g' /usr/share/keystone/wsgi-
 sed -i 's/^Listen.*80$/Listen 192.168.2.21:80/g' /etc/httpd/conf/httpd.conf
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 sed -i 's/^Listen.*5000$/Listen 192.168.2.22:5000/g' /usr/share/keystone/wsgi-keystone.conf
@@ -722,7 +719,7 @@ sed -i 's/^Listen.*35357$/Listen 192.168.2.22:35357/g' /usr/share/keystone/wsgi-
 sed -i 's/^Listen.*80$/Listen 192.168.2.22:80/g' /etc/httpd/conf/httpd.conf
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 sed -i 's/^Listen.*5000$/Listen 192.168.2.23:5000/g' /usr/share/keystone/wsgi-keystone.conf
@@ -732,7 +729,7 @@ sed -i 's/^Listen.*80$/Listen 192.168.2.23:80/g' /etc/httpd/conf/httpd.conf
 
 创建`wsgi-keystone.conf`链接
 
-[all]
+\[all]
 
 ```bash
 ln -sf /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
@@ -740,7 +737,7 @@ ln -sf /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
 
 设置开机自启并启动
 
-[all]
+\[all]
 
 ```bash
 systemctl restart httpd.service
@@ -752,7 +749,7 @@ systemctl status httpd.service
 
 修改 haproxy 配置
 
-[ALL]
+\[ALL]
 
 ```bash
 cat >> /etc/haproxy/haproxy.cfg << EOF
@@ -781,7 +778,7 @@ EOF
 
 重启`haproxy`
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs resource restart haproxy
@@ -789,7 +786,7 @@ pcs resource restart haproxy
 
 ### 创建域，项目，用户和角色
 
-[controller1]
+\[controller1]
 
 配置管理帐户
 
@@ -838,7 +835,7 @@ openstack role add --project demo --user demo user
 
 ### 请禁用临时身份验证令牌机制
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/keystone/keystone-paste.ini 'pipeline:public_api' 'pipeline' 'cors sizelimit http_proxy_to_wsgi osprofiler url_normalize request_id build_auth_context token_auth json_body ec2_extension public_service'
@@ -848,7 +845,7 @@ openstack-config --set /etc/keystone/keystone-paste.ini 'pipeline:api_v3' 'pipel
 
 ### 创建脚本
 
-[all]
+\[all]
 
 admin 脚本
 
@@ -882,7 +879,7 @@ EOF
 
 ### 验证
 
-[all]
+\[all]
 
 ```bash
 . ~/demo-openrc && \
@@ -895,7 +892,7 @@ openstack token issue
 
 创建 ceph 用户`cephuser`,并设置免密 sudo 权限
 
-[all]
+\[all]
 
 ```bash
 useradd -d /home/cephuser -m cephuser
@@ -906,7 +903,7 @@ sudo chmod 0440 /etc/sudoers.d/cephuser
 
 拷贝密钥
 
-[controller1]
+\[controller1]
 
 ```bash
 ssh-copy-id cephuser@controller1 ; \
@@ -916,7 +913,7 @@ ssh-copy-id cephuser@controller3
 
 创建部署临时文件目录
 
-[controller1]
+\[controller1]
 
 ```bash
 mkdir ~/my-cluster
@@ -925,7 +922,7 @@ cd ~/my-cluster
 
 安装部署工具 `ceph-deploy`
 
-[controller1]
+\[controller1]
 
 ```bash
 yum -y install python-pip
@@ -934,7 +931,7 @@ pip install ceph-deploy==1.5.36.0
 
 清理环境
 
-[controller1]
+\[controller1]
 
 ```bash
 ceph-deploy --username cephuser purge controller1 controller2 controller3
@@ -944,7 +941,7 @@ ceph-deploy --username cephuser forgetkeys
 
 创建集群
 
-[controller1]
+\[controller1]
 
 ```bash
 ceph-deploy --username cephuser new controller1 controller2 controller3
@@ -952,7 +949,7 @@ ceph-deploy --username cephuser new controller1 controller2 controller3
 
 安装软件包
 
-[all]
+\[all]
 
 ```bash
 yum install -y ceph ceph-common ceph-radosgw
@@ -960,7 +957,7 @@ yum install -y ceph ceph-common ceph-radosgw
 
 初始 monitor(s)、并收集所有密钥
 
-[controller1]
+\[controller1]
 
 ```bash
 ceph-deploy --username cephuser mon create-initial
@@ -968,7 +965,7 @@ ceph-deploy --username cephuser mon create-initial
 
 创建 OSD
 
-[controller1]
+\[controller1]
 
 ```bash
 ceph-deploy --username cephuser disk zap controller1:/dev/vdb controller2:/dev/vdb controller3:/dev/vdb
@@ -979,7 +976,7 @@ ceph-deploy --username cephuser osd create controller1:/dev/vdb controller2:/dev
 
 ### 配置数据库
 
-[controller1]
+\[controller1]
 
 连接数据库
 
@@ -1001,7 +998,7 @@ EXIT;
 
 ### 创建用户，服务实体和端点
 
-[controller1]
+\[controller1]
 
 加载 admin 环境变量
 
@@ -1043,7 +1040,7 @@ openstack endpoint create --region RegionOne \
 
 安装软件包
 
-[all]
+\[all]
 
 ```bash
 yum install -y openstack-glance
@@ -1051,7 +1048,7 @@ yum install -y openstack-glance
 
 配置`/etc/glance/glance-api.conf`
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/glance/glance-api.conf 'database' 'connection' 'mysql+pymysql://glance:GLANCE_DBPASS@controller/glance'
@@ -1071,19 +1068,19 @@ openstack-config --set /etc/glance/glance-api.conf 'glance_store' 'default_store
 openstack-config --set /etc/glance/glance-api.conf 'glance_store' 'filesystem_store_datadir' '/var/lib/glance/images/'
 ```
 
-[controller1]
+\[controller1]
 
 ```bash
 openstack-config --set /etc/glance/glance-api.conf 'DEFAULT' 'bind_host' '192.168.2.21'
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 openstack-config --set /etc/glance/glance-api.conf 'DEFAULT' 'bind_host' '192.168.2.22'
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 openstack-config --set /etc/glance/glance-api.conf 'DEFAULT' 'bind_host' '192.168.2.23'
@@ -1091,7 +1088,7 @@ openstack-config --set /etc/glance/glance-api.conf 'DEFAULT' 'bind_host' '192.16
 
 配置`/etc/glance/glance-registry.conf`
 
-[ALL]
+\[ALL]
 
 ```bash
 openstack-config --set /etc/glance/glance-registry.conf 'database' 'connection' 'mysql+pymysql://glance:GLANCE_DBPASS@controller/glance'
@@ -1107,19 +1104,19 @@ openstack-config --set /etc/glance/glance-registry.conf 'keystone_authtoken' 'pa
 openstack-config --set /etc/glance/glance-registry.conf 'paste_deploy' 'flavor' 'keystone'
 ```
 
-[controller1]
+\[controller1]
 
 ```bash
 openstack-config --set /etc/glance/glance-registry.conf 'DEFAULT' 'bind_host' '192.168.2.21'
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 openstack-config --set /etc/glance/glance-registry.conf 'DEFAULT' 'bind_host' '192.168.2.22'
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 openstack-config --set /etc/glance/glance-registry.conf 'DEFAULT' 'bind_host' '192.168.2.23'
@@ -1127,7 +1124,7 @@ openstack-config --set /etc/glance/glance-registry.conf 'DEFAULT' 'bind_host' '1
 
 填充数据库
 
-[controller1]
+\[controller1]
 
 ```bash
 su -s /bin/sh -c "glance-manage db_sync" glance
@@ -1135,7 +1132,7 @@ su -s /bin/sh -c "glance-manage db_sync" glance
 
 设置开机自启并启动
 
-[all]
+\[all]
 
 ```bash
 systemctl restart openstack-glance-api.service \
@@ -1150,7 +1147,7 @@ systemctl status openstack-glance-api.service \
 
 修改 haproxy 配置
 
-[all]
+\[all]
 
 ```bash
 cat << EOF >> /etc/haproxy/haproxy.cfg
@@ -1178,7 +1175,7 @@ EOF
 
 重启`haproxy`
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs resource restart haproxy
@@ -1188,7 +1185,7 @@ pcs resource restart haproxy
 
 创建 images 池
 
-[controller1]
+\[controller1]
 
 ```bash
 ceph osd pool create images 128
@@ -1196,7 +1193,7 @@ ceph osd pool create images 128
 
 创建 Glance 用户
 
-[controller1]
+\[controller1]
 
 ```bash
 ceph auth get-or-create client.glance mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=images'
@@ -1204,7 +1201,7 @@ ceph auth get-or-create client.glance mon 'allow r' osd 'allow class-read object
 
 client.glance 的密钥环复制到适当的节点，并更改所有权
 
-[controller1]
+\[controller1]
 
 ```bash
 ceph auth get-or-create client.glance | ssh controller1 sudo tee /etc/ceph/ceph.client.glance.keyring
@@ -1219,7 +1216,7 @@ ssh controller3 sudo chown glance:glance /etc/ceph/ceph.client.glance.keyring
 
 配置`/etc/glance/glance-api.conf`
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/glance/glance-api.conf 'glance_store' 'stores' 'file,http,rbd'
@@ -1233,7 +1230,7 @@ openstack-config --set /etc/glance/glance-api.conf 'glance_store' 'rbd_store_chu
 
 重启服务
 
-[all]
+\[all]
 
 ```bash
 systemctl restart openstack-glance-api.service \
@@ -1244,7 +1241,7 @@ systemctl status openstack-glance-api.service \
 
 ### 验证
 
-[controller1]
+\[controller1]
 
 获取 admin 环境
 
@@ -1277,7 +1274,7 @@ openstack image list
 
 ### 配置数据库
 
-[all]
+\[all]
 
 连接数据库
 
@@ -1304,7 +1301,7 @@ EXIT;
 
 ### 创建用户，服务实体和端点
 
-[controller1]
+\[controller1]
 
 获取 admin 环境变量
 
@@ -1347,7 +1344,7 @@ openstack endpoint create --region RegionOne \
 
 安装软件包
 
-[ALL]
+\[ALL]
 
 ```bash
 yum install -y openstack-nova-api openstack-nova-conductor \
@@ -1357,7 +1354,7 @@ yum install -y openstack-nova-api openstack-nova-conductor \
 
 配置`/etc/nova/nova.conf`
 
-[ALL]
+\[ALL]
 
 ```bash
 openstack-config --set /etc/nova/nova.conf 'DEFAULT' 'enabled_apis' 'osapi_compute,metadata'
@@ -1388,19 +1385,19 @@ openstack-config --set /etc/nova/nova.conf 'glance' 'api_servers' 'http://contro
 openstack-config --set /etc/nova/nova.conf 'oslo_concurrency' 'lock_path' '/var/lib/nova/tmp'
 ```
 
-[controller1]
+\[controller1]
 
 ```bash
 openstack-config --set /etc/nova/nova.conf 'DEFAULT' 'my_ip' '192.168.2.21'
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 openstack-config --set /etc/nova/nova.conf 'DEFAULT' 'my_ip' '192.168.2.22'
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 openstack-config --set /etc/nova/nova.conf 'DEFAULT' 'my_ip' '192.168.2.23'
@@ -1408,7 +1405,7 @@ openstack-config --set /etc/nova/nova.conf 'DEFAULT' 'my_ip' '192.168.2.23'
 
 填充数据库
 
-[controller1]
+\[controller1]
 
 ```bash
 su -s /bin/sh -c "nova-manage api_db sync" nova
@@ -1417,7 +1414,7 @@ su -s /bin/sh -c "nova-manage db sync" nova
 
 设置服务开机自启并启动
 
-[all]
+\[all]
 
 ```bash
 systemctl restart openstack-nova-api.service \
@@ -1433,7 +1430,7 @@ systemctl status openstack-nova-api.service \
 
 ### 配置 Haproxy
 
-[all]
+\[all]
 
 配置 haproxy 配置文件
 
@@ -1472,7 +1469,7 @@ EOF
 
 重启`haproxy`
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs resource restart haproxy
@@ -1480,7 +1477,7 @@ pcs resource restart haproxy
 
 ### 防火墙放行
 
-[all]
+\[all]
 
 ```bash
 firewall-cmd --permanent --add-port=6080/tcp
@@ -1491,7 +1488,7 @@ firewall-cmd --reload
 
 安装软件包
 
-[all]
+\[all]
 
 ```bash
 yum install -y openstack-nova-compute
@@ -1499,7 +1496,7 @@ yum install -y openstack-nova-compute
 
 配置`/etc/nova/nova.conf`
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/nova/nova.conf 'DEFAULT' 'enabled_apis' 'osapi_compute,metadata'
@@ -1524,19 +1521,19 @@ openstack-config --set /etc/nova/nova.conf 'glance' 'api_servers' 'http://contro
 openstack-config --set /etc/nova/nova.conf 'oslo_concurrency' 'lock_path' '/var/lib/nova/tmp'
 ```
 
-[controller1]
+\[controller1]
 
 ```bash
 openstack-config --set /etc/nova/nova.conf 'DEFAULT' 'my_ip' '192.168.2.21'
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 openstack-config --set /etc/nova/nova.conf 'DEFAULT' 'my_ip' '192.168.2.22'
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 openstack-config --set /etc/nova/nova.conf 'DEFAULT' 'my_ip' '192.168.2.23'
@@ -1557,7 +1554,7 @@ openstack-config --set /etc/nova/nova.conf 'libvirt' 'cpu_mode' 'none'
 
 设置开机自启并启动
 
-[all]
+\[all]
 
 ```bash
 systemctl restart libvirtd.service openstack-nova-compute.service
@@ -1567,7 +1564,7 @@ systemctl status libvirtd.service openstack-nova-compute.service
 
 ### 验证
 
-[all]
+\[all]
 
 获取 admin 环境变量
 
@@ -1585,7 +1582,7 @@ openstack compute service list
 
 ### 配置数据库
 
-[controller1]
+\[controller1]
 
 连接数据库
 
@@ -1607,7 +1604,7 @@ EXIT;
 
 ### 创建用户，服务实体和端点
 
-[controller1]
+\[controller1]
 
 获取 admin 环境变量
 
@@ -1648,7 +1645,7 @@ openstack endpoint create --region RegionOne \
 
 ### 配置 Haproxy
 
-[all]
+\[all]
 
 配置 haproxy 配置文件
 
@@ -1669,7 +1666,7 @@ EOF
 
 重启`haproxy`
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs resource restart haproxy
@@ -1679,7 +1676,7 @@ pcs resource restart haproxy
 
 #### 配置私有网络类型
 
-[all]
+\[all]
 
 安装软件包
 
@@ -1688,9 +1685,9 @@ yum install -y openstack-neutron openstack-neutron-ml2 \
   openstack-neutron-linuxbridge ebtables
 ```
 
-##### 配置`neutron.conf`
+**配置`neutron.conf`**
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/neutron/neutron.conf 'database' 'connection' 'mysql+pymysql://neutron:NEUTRON_DBPASS@controller/neutron'
@@ -1732,30 +1729,29 @@ openstack-config --set /etc/neutron/neutron.conf 'DEFAULT' 'max_l3_agents_per_ro
 openstack-config --set /etc/neutron/neutron.conf 'DEFAULT' 'min_l3_agents_per_router' '2'
 # 配置锁定路径
 openstack-config --set /etc/neutron/neutron.conf 'oslo_concurrency' 'lock_path' '/var/lib/neutron/tmp'
-
 ```
 
-[controller1]
+\[controller1]
 
 ```bash
 openstack-config --set /etc/neutron/neutron.conf 'DEFAULT' 'bind_host' '192.168.2.21'
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 openstack-config --set /etc/neutron/neutron.conf 'DEFAULT' 'bind_host' '192.168.2.22'
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 openstack-config --set /etc/neutron/neutron.conf 'DEFAULT' 'bind_host' '192.168.2.23'
 ```
 
-##### 配置`ml2_conf.ini`
+**配置`ml2_conf.ini`**
 
-[all]
+\[all]
 
 ```bash
 # 启用flat，VLAN和VXLAN网络
@@ -1774,9 +1770,9 @@ openstack-config --set /etc/neutron/plugins/ml2/ml2_conf.ini 'ml2_type_vxlan' 'v
 openstack-config --set /etc/neutron/plugins/ml2/ml2_conf.ini 'securitygroup' 'enable_ipset' 'True'
 ```
 
-##### 配置 Linux 桥代理
+**配置 Linux 桥代理**
 
-[all]
+\[all]
 
 ```bash
 # 配置公共网络物理网络接口
@@ -1787,38 +1783,37 @@ openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'vxlan' 'l
 # 启用安全组并配置Linux桥接iptables防火墙驱动程序
 openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'securitygroup' 'enable_security_group' 'True'
 openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'securitygroup' 'firewall_driver' 'neutron.agent.linux.iptables_firewall.IptablesFirewallDriver'
-
 ```
 
-[controller1]
+\[controller1]
 
 ```bash
 openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'vxlan' 'local_ip' '192.168.2.21'
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'vxlan' 'local_ip' '192.168.2.22'
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'vxlan' 'local_ip' '192.168.2.23'
 ```
 
-##### 配置第 3 层代理
+**配置第 3 层代理**
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/neutron/l3_agent.ini 'DEFAULT' 'interface_driver' 'neutron.agent.linux.interface.BridgeInterfaceDriver'
 ```
 
-##### 配置 DHCP 代理
+**配置 DHCP 代理**
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/neutron/dhcp_agent.ini 'DEFAULT' 'interface_driver' 'neutron.agent.linux.interface.BridgeInterfaceDriver'
@@ -1828,7 +1823,7 @@ openstack-config --set /etc/neutron/dhcp_agent.ini 'DEFAULT' 'enable_isolated_me
 
 #### 配置元数据代理
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/neutron/metadata_agent.ini 'DEFAULT' 'nova_metadata_ip' '192.168.2.20'
@@ -1837,7 +1832,7 @@ openstack-config --set /etc/neutron/metadata_agent.ini 'DEFAULT' 'metadata_proxy
 
 #### 配置 Compute 服务以使用 Networking 服务
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/nova/nova.conf 'neutron' 'url' 'http://controller:9696'
@@ -1851,14 +1846,13 @@ openstack-config --set /etc/nova/nova.conf 'neutron' 'username' 'neutron'
 openstack-config --set /etc/nova/nova.conf 'neutron' 'password' 'NEUTRON_PASS'
 openstack-config --set /etc/nova/nova.conf 'neutron' 'service_metadata_proxy' 'True'
 openstack-config --set /etc/nova/nova.conf 'neutron' 'metadata_proxy_shared_secret' 'METADATA_SECRET'
-
 ```
 
 #### 完成安装
 
 创建 ML2 插件配置文件的连接
 
-[all]
+\[all]
 
 ```bash
 ln -sf /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini
@@ -1866,7 +1860,7 @@ ln -sf /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini
 
 填充数据库
 
-[controller1]
+\[controller1]
 
 ```bash
 su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
@@ -1875,7 +1869,7 @@ su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
 
 重新启动 Compute API 服务
 
-[all]
+\[all]
 
 ```bash
 systemctl restart openstack-nova-api.service
@@ -1883,7 +1877,7 @@ systemctl restart openstack-nova-api.service
 
 设置网络服务开启自启并启动
 
-[all]
+\[all]
 
 ```bash
 systemctl restart neutron-server.service \
@@ -1901,7 +1895,7 @@ systemctl status neutron-server.service \
 
 ### 安装配置计算部分
 
-[all]
+\[all]
 
 安装软件包
 
@@ -1931,9 +1925,9 @@ openstack-config --set /etc/neutron/neutron.conf 'oslo_concurrency' 'lock_path' 
 
 #### 配置私有网络类型
 
-##### 配置 Linux 桥代理
+**配置 Linux 桥代理**
 
-[all]
+\[all]
 
 ```bash
 # 配置公共网络物理网络接口
@@ -1944,22 +1938,21 @@ openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'vxlan' 'l
 # 启用安全组并配置Linux桥接iptables防火墙驱动程序
 openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'securitygroup' 'enable_security_group' 'True'
 openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'securitygroup' 'firewall_driver' 'neutron.agent.linux.iptables_firewall.IptablesFirewallDriver'
-
 ```
 
-[controller1]
+\[controller1]
 
 ```bash
 openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'vxlan' 'local_ip' '192.168.2.21'
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'vxlan' 'local_ip' '192.168.2.22'
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'vxlan' 'local_ip' '192.168.2.23'
@@ -1967,7 +1960,7 @@ openstack-config --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini 'vxlan' 'l
 
 #### 配置 Compute 服务以使用 Networking 服务
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/nova/nova.conf 'neutron' 'url' 'http://controller:9696'
@@ -1983,7 +1976,7 @@ openstack-config --set /etc/nova/nova.conf 'neutron' 'password' 'NEUTRON_PASS'
 
 #### 完成安装
 
-[all]
+\[all]
 
 重启 Compute 服务
 
@@ -2001,7 +1994,7 @@ systemctl status neutron-linuxbridge-agent.service
 
 ### 验证
 
-[controller1]
+\[controller1]
 
 获取 admin 环境变量
 
@@ -2017,7 +2010,7 @@ openstack network agent list
 
 ### 创建网络
 
-[controller1]
+\[controller1]
 
 创建外部网络
 
@@ -2072,7 +2065,7 @@ neutron router-gateway-set router provider
 
 ### 安装配置软件
 
-[all]
+\[all]
 
 安装软件
 
@@ -2105,7 +2098,6 @@ OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = "default"
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
 TIME_ZONE  = "Asia/Shanghai"
 EOF
-
 ```
 
 重新启动 Web 服务器和会话存储服务
@@ -2117,7 +2109,7 @@ systemctl status httpd.service memcached.service
 
 ### 配置 Haproxy
 
-[all]
+\[all]
 
 配置 haproxy 配置文件
 
@@ -2138,7 +2130,7 @@ EOF
 
 重启`haproxy`
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs resource restart haproxy
@@ -2146,7 +2138,7 @@ pcs resource restart haproxy
 
 防火墙放行 80 端口
 
-[all]
+\[all]
 
 ```bash
 firewall-cmd --permanent --add-port=80/tcp
@@ -2157,9 +2149,7 @@ firewall-cmd --reload
 
 打开浏览器，访问：http://192.168.2.20/dashboard/
 
-域：default
-用户名：admin
-密码：ADMIN_PASS
+域：default 用户名：admin 密码：ADMIN\_PASS
 
 ## Block Storage service
 
@@ -2167,7 +2157,7 @@ firewall-cmd --reload
 
 #### 配置 Haproxy
 
-[all]
+\[all]
 
 配置 haproxy 配置文件
 
@@ -2188,7 +2178,7 @@ EOF
 
 重启`haproxy`
 
-[controller1]
+\[controller1]
 
 ```bash
 pcs resource restart haproxy
@@ -2196,7 +2186,7 @@ pcs resource restart haproxy
 
 #### 配置数据库
 
-[controller1]
+\[controller1]
 
 连接数据库
 
@@ -2218,7 +2208,7 @@ EXIT;
 
 #### 创建用户和端点
 
-[controller1]
+\[controller1]
 
 加载`admin`凭证
 
@@ -2267,7 +2257,7 @@ openstack endpoint create --region RegionOne \
 
 #### 安装和配置组件
 
-[all]
+\[all]
 
 安装软件包
 
@@ -2277,7 +2267,7 @@ yum install -y openstack-cinder
 
 配置`/etc/cinder/cinder.conf`文件
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/cinder/cinder.conf 'database' 'connection' 'mysql+pymysql://cinder:CINDER_DBPASS@controller/cinder'
@@ -2296,21 +2286,21 @@ openstack-config --set /etc/cinder/cinder.conf 'keystone_authtoken' 'password' '
 openstack-config --set /etc/cinder/cinder.conf 'oslo_concurrency' 'lock_path' '/var/lib/cinder/tmp'
 ```
 
-[controller1]
+\[controller1]
 
 ```bash
 openstack-config --set /etc/cinder/cinder.conf 'DEFAULT' 'my_ip' '192.168.2.21'
 openstack-config --set /etc/cinder/cinder.conf 'DEFAULT' 'osapi_volume_listen' '192.168.2.21'
 ```
 
-[controller2]
+\[controller2]
 
 ```bash
 openstack-config --set /etc/cinder/cinder.conf 'DEFAULT' 'my_ip' '192.168.2.22'
 openstack-config --set /etc/cinder/cinder.conf 'DEFAULT' 'osapi_volume_listen' '192.168.2.22'
 ```
 
-[controller3]
+\[controller3]
 
 ```bash
 openstack-config --set /etc/cinder/cinder.conf 'DEFAULT' 'my_ip' '192.168.2.23'
@@ -2319,7 +2309,7 @@ openstack-config --set /etc/cinder/cinder.conf 'DEFAULT' 'osapi_volume_listen' '
 
 填充块存储数据库
 
-[controller1]
+\[controller1]
 
 ```bash
 su -s /bin/sh -c "cinder-manage db sync" cinder
@@ -2327,7 +2317,7 @@ su -s /bin/sh -c "cinder-manage db sync" cinder
 
 配置计算以使用块存储
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set /etc/nova/nova.conf 'cinder' 'os_region_name' 'RegionOne'
@@ -2335,7 +2325,7 @@ openstack-config --set /etc/nova/nova.conf 'cinder' 'os_region_name' 'RegionOne'
 
 重新启动 Compute API 服务
 
-[all]
+\[all]
 
 ```bash
 systemctl restart openstack-nova-api.service
@@ -2343,7 +2333,7 @@ systemctl restart openstack-nova-api.service
 
 启动 Block Storage 服务并将其配置为在系统引导时启动
 
-[all]
+\[all]
 
 ```bash
 systemctl restart openstack-cinder-api.service openstack-cinder-scheduler.service
@@ -2355,7 +2345,7 @@ systemctl status openstack-cinder-api.service openstack-cinder-scheduler.service
 
 创建存储池
 
-[controller1]
+\[controller1]
 
 ```bash
 ceph osd pool create volumes 128
@@ -2364,7 +2354,7 @@ ceph osd pool create vms 128
 
 创建 Cinder 用户
 
-[controller1]
+\[controller1]
 
 ```bash
 ceph auth get-or-create client.cinder mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=volumes, allow rwx pool=vms, allow rx pool=images'
@@ -2372,7 +2362,7 @@ ceph auth get-or-create client.cinder mon 'allow r' osd 'allow class-read object
 
 client.cinder 的密钥环复制到适当的节点，并更改所有权
 
-[controller1]
+\[controller1]
 
 ```bash
 ceph auth get-or-create client.cinder | ssh controller1 sudo tee /etc/ceph/ceph.client.cinder.keyring
@@ -2387,7 +2377,7 @@ ssh controller3 sudo chown cinder:cinder /etc/ceph/ceph.client.cinder.keyring
 
 在 nova-compute 的节点上创建一个密钥的临时副本
 
-[all]
+\[all]
 
 ```bash
 ceph auth get-key client.cinder > ~/client.cinder.key
@@ -2395,7 +2385,7 @@ ceph auth get-key client.cinder > ~/client.cinder.key
 
 在计算节点上把密钥加进 libvirt 、然后删除临时副本
 
-[all]
+\[all]
 
 ```bash
 cat > ~/secret.xml <<EOF
@@ -2414,7 +2404,7 @@ sudo virsh secret-set-value --secret 457eb676-33da-42ec-9a8c-9293d545c337 --base
 
 配置`/etc/cinder/cinder.conf`文件
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set  /etc/cinder/cinder.conf 'DEFAULT' 'enabled_backends' 'ceph'
@@ -2432,7 +2422,7 @@ openstack-config --set  /etc/cinder/cinder.conf 'ceph' 'rbd_secret_uuid' '457eb6
 
 配置计算`/etc/nova/nova.conf`文件
 
-[all]
+\[all]
 
 ```bash
 openstack-config --set  /etc/nova/nova.conf 'libvirt' 'images_type ' 'rbd'
@@ -2450,7 +2440,7 @@ openstack-config --set  /etc/nova/nova.conf 'libvirt' 'hw_disk_discard' 'unmap'
 
 启用 rbd cache 功能
 
-[all]
+\[all]
 
 ```bash
 echo '
@@ -2473,7 +2463,7 @@ systemctl restart ceph.target
 
 配置热迁移
 
-[all]
+\[all]
 
 ```bash
 sed -i 's/\(^\|\#\)listen_tls.\?=.*/listen_tls = 0/g' /etc/libvirt/libvirtd.conf
@@ -2487,7 +2477,7 @@ sed -i 's/\(^\|\#\)LIBVIRTD_ARGS.\?=.*/LIBVIRTD_ARGS = \"--listen\"/g' /etc/sysc
 
 重启计算节点
 
-[all]
+\[all]
 
 ```bash
 systemctl restart libvirtd.service openstack-nova-compute.service
@@ -2496,7 +2486,7 @@ systemctl status libvirtd.service openstack-nova-compute.service
 
 重启 cinder-volume
 
-[all]
+\[all]
 
 ```bash
 systemctl restart openstack-cinder-volume.service

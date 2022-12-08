@@ -8,149 +8,134 @@
 
 ## 安装
 
-- 环境
+*   环境
 
-  操作系统：CentOS 7.6.1810
+    操作系统：CentOS 7.6.1810
 
-  数据库：MySQL 5.7.26
+    数据库：MySQL 5.7.26
 
-  JDK：1.8_201
+    JDK：1.8\_201
 
-  Jira：8.5.1
+    Jira：8.5.1
+*   安装字体库
 
-- 安装字体库
+    ```bash
+    yum install -y fontconfig
+    ```
+* 安装并配置 JDK
+* 安装 MySQL
+*   配置 MySQL
 
-  ```bash
-  yum install -y fontconfig
-  ```
+    在`/etc/my.cnf`文件添加如下内容
 
-- 安装并配置 JDK
+    ```properties
+    [mysqld]
+    default-storage-engine=INNODB
+    character_set_server=utf8mb4
+    innodb_default_row_format=DYNAMIC
+    innodb_large_prefix=ON
+    innodb_file_format=Barracuda
+    innodb_log_file_size=2G
+    ```
+*   创建数据库及用户
 
-- 安装 MySQL
+    ```sql
+    CREATE DATABASE jira CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+    GRANT ALL PRIVILEGES on jira.* TO 'jira'@'localhost' IDENTIFIED BY 'redhat';
+    flush privileges;
+    ```
+*   下载软件包并解压
 
-- 配置 MySQL
+    ```bash
+    wget https://product-downloads.atlassian.com/software/jira/downloads/atlassian-jira-software-8.5.1.tar.gz
+    mkdir -p /opt/atlassian
+    tar -xvf atlassian-jira-software-8.5.1.tar.gz -C /opt/atlassian
+    cd /opt/atlassian
+    mv atlassian-jira-software-8.5.1-standalone jira
+    ```
+*   下载 JDBC Jar 包
 
-  在`/etc/my.cnf`文件添加如下内容
+    ```bash
+    wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.48/mysql-connector-java-5.1.48.jar
+    mv mysql-connector-java-5.1.48.jar /opt/atlassian/jira/lib
+    ```
+*   创建运行用户
 
-  ```properties
-  [mysqld]
-  default-storage-engine=INNODB
-  character_set_server=utf8mb4
-  innodb_default_row_format=DYNAMIC
-  innodb_large_prefix=ON
-  innodb_file_format=Barracuda
-  innodb_log_file_size=2G
-  ```
+    ```bash
+    useradd --create-home --comment "Account for running Jira Software" --shell /bin/bash jira
+    ```
+*   创建并配置`jira.home`目录
 
-- 创建数据库及用户
+    ```bash
+    mkdir -p /var/atlassian/application-data/jira
+    ```
 
-  ```sql
-  CREATE DATABASE jira CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-  GRANT ALL PRIVILEGES on jira.* TO 'jira'@'localhost' IDENTIFIED BY 'redhat';
-  flush privileges;
-  ```
+    修改`/opt/atlassian/jira/atlassian-jira/WEB-INF/classes/jira-application.properties`文件，添加如下内容
 
-- 下载软件包并解压
+    ```properties
+    jira.home = /var/atlassian/application-data/jira
+    ```
+*   配置运行用户
 
-  ```bash
-  wget https://product-downloads.atlassian.com/software/jira/downloads/atlassian-jira-software-8.5.1.tar.gz
-  mkdir -p /opt/atlassian
-  tar -xvf atlassian-jira-software-8.5.1.tar.gz -C /opt/atlassian
-  cd /opt/atlassian
-  mv atlassian-jira-software-8.5.1-standalone jira
-  ```
+    编辑`/opt/atlassian/jira/bin/user.sh`，修改如下内容
 
-- 下载 JDBC Jar 包
+    ```properties
+    CONF_USER="jira"
+    ```
+*   修改文件权限
 
-  ```bash
-  wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.48/mysql-connector-java-5.1.48.jar
-  mv mysql-connector-java-5.1.48.jar /opt/atlassian/jira/lib
-  ```
+    ```bash
+    chown -R jira:jira /opt/atlassian/jira
+    chmod -R u=rwx,go-rwx /opt/atlassian/jira
+    chown -R jira:jira /var/atlassian/application-data/jira
+    chmod -R u=rwx,go-rwx /var/atlassian/application-data/jira
+    ```
+*   创建启动脚本
 
-- 创建运行用户
+    编辑`/etc/init.d/jira`
 
-  ```bash
-  useradd --create-home --comment "Account for running Jira Software" --shell /bin/bash jira
-  ```
+    ```properties
+    #!/bin/bash
 
-- 创建并配置`jira.home`目录
+    # JIRA Linux service controller script
+    cd "/opt/atlassian/jira/bin"
 
-  ```bash
-  mkdir -p /var/atlassian/application-data/jira
-  ```
+    case "$1" in
+        start)
+            ./start-jira.sh
+            ;;
+        stop)
+            ./stop-jira.sh
+            ;;
+        *)
+            echo "Usage: $0 {start|stop}"
+            exit 1
+            ;;
+    esac
+    ```
 
-  修改`/opt/atlassian/jira/atlassian-jira/WEB-INF/classes/jira-application.properties`文件，添加如下内容
+    添加可执行权限
 
-  ```properties
-  jira.home = /var/atlassian/application-data/jira
-  ```
-
-- 配置运行用户
-
-  编辑`/opt/atlassian/jira/bin/user.sh`，修改如下内容
-
-  ```properties
-  CONF_USER="jira"
-  ```
-
-- 修改文件权限
-
-  ```bash
-  chown -R jira:jira /opt/atlassian/jira
-  chmod -R u=rwx,go-rwx /opt/atlassian/jira
-  chown -R jira:jira /var/atlassian/application-data/jira
-  chmod -R u=rwx,go-rwx /var/atlassian/application-data/jira
-  ```
-
-- 创建启动脚本
-
-  编辑`/etc/init.d/jira`
-
-  ```properties
-  #!/bin/bash
-
-  # JIRA Linux service controller script
-  cd "/opt/atlassian/jira/bin"
-
-  case "$1" in
-      start)
-          ./start-jira.sh
-          ;;
-      stop)
-          ./stop-jira.sh
-          ;;
-      *)
-          echo "Usage: $0 {start|stop}"
-          exit 1
-          ;;
-  esac
-
-  ```
-
-  添加可执行权限
-
-  ```bash
-  chmod +x /etc/init.d/jira
-  ```
+    ```bash
+    chmod +x /etc/init.d/jira
+    ```
 
 ## 破解
 
-- 下载破解程序`atlassian-agent.jar`到`/opt/atlassian/`目录
+* 下载破解程序`atlassian-agent.jar`到`/opt/atlassian/`目录
+*   配置破解程序
 
-- 配置破解程序
+    修改`/opt/atlassian/jira/bin/setenv.sh`添加如下内容
 
-  修改`/opt/atlassian/jira/bin/setenv.sh`添加如下内容
+    ```properties
+    export JAVA_OPTS="-javaagent:/opt/atlassian/atlassian-agent.jar ${JAVA_OPTS}"
+    ```
+*   获取许可
 
-  ```properties
-  export JAVA_OPTS="-javaagent:/opt/atlassian/atlassian-agent.jar ${JAVA_OPTS}"
-  ```
-
-- 获取许可
-
-  ```bash
-  cd /opt/atlassian/
-  # Jira Software
-  java -jar atlassian-agent.jar -p jira -m test@test.com -n test -o test -s BTQ1-ISAR-VBIS-1OBO
-  # Jira Core
-  java -jar atlassian-agent.jar -p jc -m test@test.com -n test -o test -s BTQ1-ISAR-VBIS-1OBO
-  ```
+    ```bash
+    cd /opt/atlassian/
+    # Jira Software
+    java -jar atlassian-agent.jar -p jira -m test@test.com -n test -o test -s BTQ1-ISAR-VBIS-1OBO
+    # Jira Core
+    java -jar atlassian-agent.jar -p jc -m test@test.com -n test -o test -s BTQ1-ISAR-VBIS-1OBO
+    ```
