@@ -66,6 +66,7 @@
     * [MariaDB Galera Cluster](shu-ju-ku/mysql/mariadb-galera-cluster.md)
     * [备份脚本](shu-ju-ku/mysql/bei-fen-jiao-ben.md)
   * [MongoDB](shu-ju-ku/mongodb/README.md)
+    * [启用账号密码登录](shu-ju-ku/mongodb/qi-yong-zhang-hao-mi-ma-deng-lu.md)
     * [备份脚本](shu-ju-ku/mongodb/bei-fen-jiao-ben.md)
 * [Nginx](nginx/README.md)
   * [CentOS7 安装 Nginx](nginx/centos7-an-zhuang-nginx.md)

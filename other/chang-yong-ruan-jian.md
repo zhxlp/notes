@@ -106,3 +106,7 @@
 ### ventoy
 
 {% embed url="https://www.ventoy.net/cn/index.html" %}
+
+
+
+{% embed url="https://www.huluer.com/product-summary/" %}
