@@ -115,6 +115,8 @@ vfox
 
 {% embed url="https://www.ventoy.net/cn/index.html" %}
 
+### 安全
 
+multiOTP
 
-{% embed url="https://www.huluer.com/product-summary/" %}
+{% embed url="https://github.com/multiOTP/multiOTPCredentialProvider" %}

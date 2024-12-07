@@ -6,7 +6,7 @@
 
 基本约束,表示一个证书是否是CA证书
 
-<img src="../.gitbook/assets/image (3).png" alt="CA证书" data-size="original">![ssl证书](<../.gitbook/assets/image (8).png>)
+<img src="../.gitbook/assets/image (3) (1).png" alt="CA证书" data-size="original">![ssl证书](<../.gitbook/assets/image (8).png>)
 
 `Path Length Constraint` 表示CA可签署的子CA层级数，默认None表示没有限制
 
@@ -39,7 +39,7 @@ basicConstraints = critical, CA:TRUE, pathlen:1
 
 使用者密钥标识符,由证书的公钥hash计算而来
 
-<figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 
 
@@ -51,7 +51,7 @@ basicConstraints = critical, CA:TRUE, pathlen:1
 
 **关系示例图**
 
-<figure><img src="../.gitbook/assets/image (7).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (7) (1).png" alt=""><figcaption></figcaption></figure>
 
 **openssl config**
 
@@ -177,7 +177,7 @@ CN = My Name
 
 **授权信息访问**
 
-<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (2) (1).png" alt=""><figcaption></figcaption></figure>
 
 | type             | 描述        | OID                |
 | ---------------- | --------- | ------------------ |
