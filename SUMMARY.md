@@ -46,6 +46,8 @@
   * [GuacamoleServer 编译安装](linux/guacamoleserver-bian-yi-an-zhuang.md)
   * [FreeBSD7.0安装AMP](linux/freebsd7.0-an-zhuang-amp.md)
   * [CentOS7 换源](linux/centos7-huan-yuan.md)
+  * [deb下载并离线安装](linux/deb-xia-zai-bing-li-xian-an-zhuang.md)
+  * [pip下载并离线安装](linux/pip-xia-zai-bing-li-xian-an-zhuang.md)
 * [Network](network/README.md)
   * [案例一](network/an-li-yi.md)
 * [JavaScript](javascript.md)
