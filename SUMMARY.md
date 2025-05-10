@@ -86,7 +86,7 @@
   * [RDP 注册表](windows/rdp-zhu-ce-biao.md)
   * [Rdp File Setting](windows/rdp-file-setting.md)
   * [本地组策略对象(LGPO)工具](windows/ben-di-zu-ce-lve-dui-xiang-lgpo-gong-ju.md)
-  * [禁用 wps2019 网络](windows/jin-yong-wps2019-wang-luo.md)
+  * [禁用应用联网](windows/jin-yong-wps2019-wang-luo.md)
   * [SQL Server 问题处理](windows/sql-server-wen-ti-chu-li.md)
   * [SQL Server Trigger](windows/sql-server-trigger.md)
   * [NSIS 脚本](windows/nsis-jiao-ben.md)
