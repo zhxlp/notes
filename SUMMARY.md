@@ -50,6 +50,8 @@
   * [pip下载并离线安装](linux/pip-xia-zai-bing-li-xian-an-zhuang.md)
 * [Network](network/README.md)
   * [案例一](network/an-li-yi.md)
+* [AI](ai/README.md)
+  * [微调Qwen2.5](ai/wei-tiao-qwen2.5.md)
 * [JavaScript](javascript.md)
 * [Zabbix](zabbix/README.md)
   * [CentOS7 安装 Zabbix4.0 LTS](zabbix/centos7-an-zhuang-zabbix4.0-lts.md)
