@@ -52,6 +52,8 @@
   * [案例一](network/an-li-yi.md)
 * [AI](ai/README.md)
   * [微调Qwen2.5](ai/wei-tiao-qwen2.5.md)
+  * [Qwen2.5 VL AWQ量化](ai/qwen2.5-vl-awq-liang-hua.md)
+  * [qwen2.5 填充权重](ai/qwen2.5-tian-chong-quan-zhong.md)
 * [JavaScript](javascript.md)
 * [Zabbix](zabbix/README.md)
   * [CentOS7 安装 Zabbix4.0 LTS](zabbix/centos7-an-zhuang-zabbix4.0-lts.md)
